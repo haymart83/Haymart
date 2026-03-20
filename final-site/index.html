@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Media Tools — Thomas Holme</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050505;color:#fff;font-family:'JetBrains Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,6vw,52px);letter-spacing:6px;text-align:center;background:linear-gradient(135deg,#00e6ff,#c0a0ff,#ff3b8a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sub{font-size:10px;letter-spacing:4px;color:#444;text-align:center;margin-bottom:48px;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;width:100%;max-width:900px}
+.card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:4px;padding:24px;text-decoration:none;color:#fff;transition:border-color .2s,transform .2s;display:block}
+.card:hover{border-color:var(--c);transform:translateY(-2px)}
+.card-icon{font-size:32px;margin-bottom:12px}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--c);margin-bottom:6px}
+.card-desc{font-size:11px;color:#555;line-height:1.7;letter-spacing:1px}
+.card-tabs{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:9px;padding:2px 7px;border:1px solid #222;border-radius:2px;color:#444;letter-spacing:1px}
+.footer{margin-top:48px;font-size:9px;color:#333;letter-spacing:2px;text-align:center}
+
+/* API Key banner */
+#api-key-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a0a00;border-bottom:2px solid #ff9500;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#api-key-banner span.lbl{font-size:11px;color:#ff9500;letter-spacing:2px;white-space:nowrap}
+#api-key-input{flex:1;min-width:200px;background:#0d0d0d;border:1px solid #ff9500;color:#fff;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;border-radius:2px;outline:none}
+#api-key-banner button{background:#ff9500;border:none;color:#000;font-family:'JetBrains Mono',monospace;font-size:10px;padding:5px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px;white-space:nowrap}
+#api-key-banner .note{font-size:10px;color:#555;white-space:nowrap}
+#api-key-spacer{height:50px}
+</style>
+</head>
+<body>
+
+<div id="api-key-banner">
+  <span class="lbl">&#128273; ANTHROPIC API KEY</span>
+  <input type="password" id="api-key-input" placeholder="Paste your API key here once (sk-ant-...) — stored in your browser only" oninput="saveKey(this.value)"/>
+  <button onclick="hideBanner()">SAVE &amp; HIDE</button>
+  <span class="note">Never leaves your device</span>
+</div>
+<div id="api-key-spacer"></div>
+
+<h1>SOCIAL MEDIA TOOLS</h1>
+<p class="sub">AI-Powered Content Suite &mdash; 2026</p>
+
+<div class="grid">
+  <a href="/rooters/" class="card" style="--c:#c8860a">
+    <div class="card-icon">&#127928;</div>
+    <div class="card-title">The Rooters</div>
+    <div class="card-desc">Complete social media suite for the band. Calendar, gig promos, auto-generate, engagement hub.</div>
+    <div class="card-tabs">
+      <span class="tag">FACEBOOK</span>
+      <span class="tag">CALENDAR</span>
+      <span class="tag">GIG PROMOS</span>
+      <span class="tag">AUTO-GEN</span>
+      <span class="tag">ENGAGEMENT</span>
+    </div>
+  </a>
+  <a href="/dubscribe/" class="card" style="--c:#00e6ff">
+    <div class="card-icon">&#127925;</div>
+    <div class="card-title">Dubscribe</div>
+    <div class="card-desc">Full pipeline for the launch campaign. Instagram, TikTok, YouTube, Live stream planner.</div>
+    <div class="card-tabs">
+      <span class="tag">INSTAGRAM</span>
+      <span class="tag">TIKTOK</span>
+      <span class="tag">YOUTUBE</span>
+      <span class="tag">LIVE</span>
+      <span class="tag">ENGAGEMENT</span>
+    </div>
+  </a>
+  <a href="/haymart/" class="card" style="--c:#7ab648">
+    <div class="card-icon">&#127807;</div>
+    <div class="card-title">Haymart</div>
+    <div class="card-desc">UK hay &amp; forage marketplace pipeline. Instagram, TikTok, Facebook content generation.</div>
+    <div class="card-tabs">
+      <span class="tag">INSTAGRAM</span>
+      <span class="tag">TIKTOK</span>
+      <span class="tag">FACEBOOK</span>
+      <span class="tag">ENGAGEMENT</span>
+    </div>
+  </a>
+  <a href="/conga/" class="card" style="--c:#c8ff00">
+    <div class="card-icon">&#127908;</div>
+    <div class="card-title">T-Love / @conga_mc</div>
+    <div class="card-desc">Artist pipeline for jungle, DnB, techno &amp; trip-hop. Live stream planner included.</div>
+    <div class="card-tabs">
+      <span class="tag">INSTAGRAM</span>
+      <span class="tag">TIKTOK</span>
+      <span class="tag">YOUTUBE</span>
+      <span class="tag">LIVE</span>
+      <span class="tag">ENGAGEMENT</span>
+    </div>
+  </a>
+</div>
+
+<div class="footer">BUILT WITH CLAUDE &mdash; ANTHROPIC &mdash; 2026</div>
+
+<script>
+function saveKey(v){if(v){localStorage.setItem('ds_api_key',v);}}
+function hideBanner(){
+  localStorage.setItem('ds_api_key', document.getElementById('api-key-input').value);
+  document.getElementById('api-key-banner').style.display='none';
+  document.getElementById('api-key-spacer').style.display='none';
+}
+(function(){
+  var k=localStorage.getItem('ds_api_key');
+  if(k){
+    document.getElementById('api-key-input').value=k;
+    document.getElementById('api-key-banner').style.display='none';
+    document.getElementById('api-key-spacer').style.display='none';
+  }
+})();
+</script>
+</body>
+</html>

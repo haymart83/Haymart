@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haymart — Social Media Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Karla:wght@300;400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#f7f2e8;--parch:#ede6d3;--warm:#faf8f3;--straw:#c8a84b;--straw-d:#9a7a2a;--straw-l:#e8d48a;--earth:#5c4a2a;--earth-l:#7a6040;--soil:#3a2e1a;--sage:#6b7c5a;--sage-l:#8a9e74;--bark:#8c7355;--ink:#2a2218;--mid:#8a7a60;--dim:#b8a888;--muted:#c8bda0;--amber:#c07a00;--amber-dim:rgba(192,122,0,0.1);--green:#2a6e2a;--green-dim:rgba(42,110,42,0.1);--red:#8b2020;--cream-d:#ede4d0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font-family:'Karla',sans-serif;min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:200;background:var(--soil);border-bottom:3px solid var(--straw);padding:0 28px;display:flex;align-items:center;height:58px}
+.logo-wrap{display:flex;align-items:center;gap:10px;border-right:1px solid rgba(200,168,75,.2);padding-right:20px;margin-right:20px}
+.logo-icon{font-size:22px}
+.logo-text{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--straw);letter-spacing:1px;line-height:1}
+.header-sub{font-family:'Courier Prime',monospace;font-size:10px;color:var(--bark);letter-spacing:2px}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--sage-l);animation:pulse 2s ease-in-out infinite;margin-right:6px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.status-cluster{margin-left:auto;display:flex;align-items:center;gap:10px}
+.region-tag{background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.3);color:var(--straw-l);padding:3px 10px;border-radius:2px;font-family:'Courier Prime',monospace;font-size:9px;letter-spacing:2px}
+
+/* NAV */
+.nav-bar{position:sticky;top:58px;z-index:150;background:var(--soil);border-bottom:1px solid rgba(200,168,75,.2);display:flex;align-items:stretch;padding:0 28px}
+.nav-tab{display:flex;align-items:center;gap:7px;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--bark);user-select:none}
+.nav-tab:hover{color:var(--straw-l)}
+.nav-tab.active-ig{color:var(--straw);border-bottom-color:var(--straw)}
+.nav-tab.active-tt{color:var(--sage-l);border-bottom-color:var(--sage-l)}
+.nav-tab.active-yt{color:#e07070;border-bottom-color:#e07070}
+.nav-tab.active-cal{color:var(--straw-l);border-bottom-color:var(--straw-l)}
+.nav-divider{width:1px;background:rgba(200,168,75,.2);margin:9px 6px}
+
+/* MAIN */
+.main{max-width:1060px;margin:0 auto;padding:26px 20px;display:grid;gap:18px}
+
+/* PANEL */
+.panel{background:var(--warm);border:1px solid var(--parch);border-radius:3px;overflow:hidden;box-shadow:0 2px 10px rgba(58,46,26,.05)}
+.panel.ig-panel::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--straw-d),var(--straw),var(--straw-d))}
+.panel.tt-panel::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--sage),var(--sage-l),var(--sage))}
+.panel.yt-panel::before{content:'';display:block;height:3px;background:linear-gradient(90deg,#8b2020,#cc4444,#8b2020)}
+.panel.cal-panel::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--straw-d),var(--straw-l),var(--straw-d))}
+.panel-header{padding:13px 22px;border-bottom:1px solid #ddd4bc;display:flex;align-items:center;gap:12px;background:var(--parch)}
+.ph-index{width:22px;height:22px;border:1.5px solid var(--straw);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:11px;color:var(--straw-d);flex-shrink:0}
+.panel-header h2{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--earth);letter-spacing:.5px}
+.panel-body{padding:24px;display:grid;gap:20px}
+
+label{display:block;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:8px}
+input[type=text],input[type=datetime-local],select,textarea{width:100%;background:var(--cream);border:1px solid #d4c8a8;color:var(--ink);font-family:'Karla',sans-serif;font-size:14px;padding:10px 13px;border-radius:2px;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--straw);box-shadow:0 0 0 3px rgba(200,168,75,.1)}
+input[type=datetime-local]::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+select option{background:var(--cream)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+@media(max-width:600px){.field-row{grid-template-columns:1fr}}
+
+/* FORMAT CHIPS */
+.format-grid{display:flex;flex-wrap:wrap;gap:7px}
+.fmt-card{display:flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid #d4c8a8;background:var(--cream);border-radius:2px;cursor:pointer;transition:all .18s;font-family:'Karla',sans-serif;font-size:12px;font-weight:500;color:var(--mid);user-select:none}
+.fmt-card:hover{border-color:var(--straw);color:var(--earth)}
+.ig-active{border-color:var(--straw-d)!important;background:#faf4e0!important;color:var(--earth)!important}
+.tt-active{border-color:var(--sage)!important;background:var(--green-dim)!important;color:var(--sage)!important}
+.yt-active{border-color:#cc4444!important;background:rgba(139,32,32,.07)!important;color:#8b2020!important}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px}
+.ctag,.tone-btn{padding:5px 12px;border:1px solid #d4c8a8;border-radius:20px;font-family:'Karla',sans-serif;font-size:12px;font-weight:500;color:var(--mid);cursor:pointer;transition:all .15s;user-select:none;background:var(--cream)}
+.ctag:hover,.tone-btn:hover{border-color:var(--straw);color:var(--earth)}
+.ctag.active{border-color:var(--straw-d);background:var(--straw-d);color:var(--cream)}
+.tone-btn.active{border-color:var(--sage);background:var(--sage);color:var(--cream)}
+
+/* UPLOAD HERO */
+.upload-hero{border:1.5px dashed #c4b890;background:var(--cream);border-radius:3px;padding:24px 18px;text-align:center;cursor:pointer;transition:all .2s;position:relative;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+.upload-hero:hover{border-color:var(--straw);background:#faf6ec}
+.upload-hero input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.uh-icon{font-size:28px}
+.uh-title{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:2px;color:var(--mid)}
+.uh-sub{font-size:12px;color:var(--muted)}
+.uh-preview{width:100%;max-height:180px;object-fit:cover;border-radius:2px;border:1px solid #d4c8a8;display:none;margin-top:6px}
+.uh-fn{font-family:'Courier Prime',monospace;font-size:11px;color:var(--straw-d);margin-top:4px;display:none;font-weight:700}
+
+/* IMAGE MODE */
+.img-mode-row{display:flex;gap:0;border:1px solid #d4c8a8;border-radius:2px;overflow:hidden}
+.img-mode-btn{flex:1;padding:9px 8px;background:transparent;border:none;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;color:var(--mid);cursor:pointer;transition:all .18s;text-align:center;border-right:1px solid #d4c8a8}
+.img-mode-btn:last-child{border-right:none}
+.img-mode-btn:hover{color:var(--earth)}
+.img-mode-btn.active-real{background:#faf4e0;color:var(--earth);font-weight:700}
+.img-mode-btn.active-ai{background:var(--amber-dim);color:var(--amber)}
+
+/* AI DISCLOSURE */
+.ai-disclosure-box{background:rgba(192,122,0,0.05);border:1px solid rgba(192,122,0,.2);border-radius:2px;padding:10px 13px;display:flex;align-items:flex-start;gap:10px}
+.ai-toggle{position:relative;width:34px;height:19px;flex-shrink:0;margin-top:2px}
+.ai-toggle input{opacity:0;width:0;height:0}
+.ai-slider{position:absolute;cursor:pointer;inset:0;background:#c8bda0;border-radius:19px;transition:.3s}
+.ai-slider:before{content:'';position:absolute;height:13px;width:13px;left:3px;bottom:3px;background:var(--dim);border-radius:50%;transition:.3s}
+.ai-toggle input:checked + .ai-slider{background:var(--amber)}
+.ai-toggle input:checked + .ai-slider:before{transform:translateX(15px);background:var(--cream)}
+.ai-disc-label{font-family:'Courier Prime',monospace;font-size:10px;color:var(--mid);letter-spacing:1px;line-height:1.6}
+.ai-disc-label strong{color:var(--amber)}
+.ai-disc-preview{color:rgba(192,122,0,.65);font-style:italic;margin-top:3px;font-size:10px;display:none}
+
+/* AI GEN PANEL */
+.ai-gen-panel{background:var(--parch);border:1px solid rgba(192,122,0,.2);border-radius:2px;padding:14px;margin-top:8px;display:none}
+.ai-gen-panel.show{display:block}
+.ai-gen-header{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--amber);margin-bottom:10px;text-transform:uppercase}
+.ai-gen-btn{padding:8px 16px;background:var(--straw-d);color:var(--cream);border:none;font-family:'Playfair Display',serif;font-size:13px;cursor:pointer;border-radius:2px;transition:all .2s}
+.ai-gen-btn:hover{background:var(--earth);transform:translateY(-1px);box-shadow:0 3px 12px rgba(58,46,26,.2)}
+.ai-gen-btn:disabled{background:var(--muted);color:var(--mid);cursor:not-allowed;transform:none;box-shadow:none}
+.ai-prompts-wrap{margin-top:12px;display:grid;gap:8px}
+.ai-prompt-block{background:var(--warm);border:1px solid #d4c8a8;border-radius:2px;padding:10px 12px}
+.apb-label{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;margin-bottom:5px;color:var(--mid)}
+.apb-text{font-size:12px;color:var(--earth-l);line-height:1.6;font-style:italic;font-family:'Playfair Display',serif}
+.apb-copy{margin-top:6px;background:transparent;border:1px solid #d4c8a8;color:var(--mid);font-family:'Courier Prime',monospace;font-size:10px;padding:3px 9px;cursor:pointer;border-radius:1px;transition:all .15s;letter-spacing:1px}
+.apb-copy:hover{border-color:var(--straw-d);color:var(--straw-d)}
+.apb-copy.copied{border-color:var(--sage);color:var(--sage)}
+
+/* GEN BUTTON */
+.gen-btn{width:100%;padding:14px;border:none;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .2s;border-radius:2px;position:relative;overflow:hidden;background:var(--earth);color:var(--straw-l)}
+.gen-btn:hover{background:var(--soil);transform:translateY(-1px);box-shadow:0 5px 18px rgba(58,46,26,.2)}
+.gen-btn:disabled{background:#c8bda0!important;color:var(--mid);cursor:not-allowed;transform:none;box-shadow:none}
+.gen-btn .progress{position:absolute;bottom:0;left:0;height:3px;background:var(--straw);width:0%;transition:width .1s linear}
+
+/* OUTPUT */
+.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.output-grid{grid-template-columns:1fr}}
+.output-card{background:var(--warm);border:1px solid var(--parch);border-radius:3px;overflow:hidden;box-shadow:0 1px 6px rgba(58,46,26,.04);animation:riseUp .4s cubic-bezier(.22,1,.36,1) both}
+@keyframes riseUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.output-card:nth-child(2){animation-delay:.07s}.output-card:nth-child(3){animation-delay:.14s}.output-card:nth-child(4){animation-delay:.21s}.output-card:nth-child(5){animation-delay:.28s}.output-card:nth-child(6){animation-delay:.35s}
+.oc-header{padding:10px 15px;border-bottom:1px solid var(--parch);display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--parch)}
+.oc-header h3{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--earth-l);text-transform:uppercase;flex:1}
+.oc-btns{display:flex;gap:5px;flex-wrap:wrap}
+.copy-btn,.save-btn,.action-btn{background:transparent;border:1px solid #d4c8a8;font-family:'Courier Prime',monospace;font-size:10px;padding:3px 8px;cursor:pointer;transition:all .15s;border-radius:1px;letter-spacing:1px;white-space:nowrap}
+.copy-btn{color:var(--mid)}.copy-btn:hover{border-color:var(--straw-d);color:var(--straw-d)}.copy-btn.copied{border-color:var(--sage);color:var(--sage)}
+.save-btn{color:var(--straw-d);border-color:rgba(154,122,42,.3);background:rgba(200,168,75,.06)}.save-btn:hover{background:rgba(200,168,75,.12)}
+.ai-badge{font-family:'Courier Prime',monospace;font-size:10px;color:var(--amber);letter-spacing:1px;padding:3px 7px;border:1px solid rgba(192,122,0,.3);border-radius:1px}
+.oc-body{padding:14px;font-size:14px;line-height:1.8;color:var(--ink);min-height:80px;white-space:pre-wrap;word-break:break-word}
+.hashtag-wrap{padding:11px 14px;display:flex;flex-wrap:wrap;gap:5px}
+.htag{background:var(--green-dim);border:1px solid rgba(107,124,90,.25);color:var(--sage);padding:3px 9px;border-radius:20px;font-family:'Karla',sans-serif;font-size:12px;font-weight:500;animation:tagIn .3s ease both}
+.htag.tt{background:rgba(107,124,90,.1);border-color:rgba(107,124,90,.2);color:var(--sage-l)}
+.htag.yt{background:rgba(139,32,32,.07);border-color:rgba(139,32,32,.2);color:#cc5555}
+@keyframes tagIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.sched-list{padding:4px 14px 10px;display:grid;gap:0}
+.sched-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--parch)}
+.sched-row:last-child{border-bottom:none}
+.sr-time{font-family:'Courier Prime',monospace;font-size:12px;font-weight:700;color:var(--straw-d);min-width:46px}
+.sr-day{font-size:13px;font-weight:600;color:var(--earth);min-width:72px}
+.sr-reason{font-size:12px;color:var(--mid);flex:1}
+.hook-box{padding:12px 14px;background:linear-gradient(135deg,rgba(107,124,90,0.06),transparent);border-left:2px solid var(--sage)}
+.hook-label{font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--sage);margin-bottom:4px}
+.hook-text{font-size:14px;color:var(--ink);line-height:1.6;font-weight:600}
+.eng-item{padding:7px 0;border-bottom:1px solid var(--parch);font-size:13px;color:var(--ink);line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+.eng-item:last-child{border-bottom:none}
+.ei-num{font-family:'Courier Prime',monospace;font-size:11px;color:var(--straw);min-width:16px;margin-top:2px}
+.full-width{grid-column:1/-1}
+
+/* CALENDAR */
+.cal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 20px;border-bottom:1px solid #ddd4bc;background:var(--parch)}
+.cal-nav-btn{background:transparent;border:1px solid #d4c8a8;color:var(--mid);font-family:'Courier Prime',monospace;font-size:12px;padding:5px 12px;cursor:pointer;border-radius:2px;transition:all .15s}
+.cal-nav-btn:hover{border-color:var(--straw-d);color:var(--straw-d)}
+.cal-month-label{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--earth);flex:1;text-align:center;letter-spacing:1px}
+.cal-header-row{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #ddd4bc;background:var(--parch)}
+.cal-day-name{padding:9px 0;text-align:center;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:2px;color:var(--mid)}
+.cal-body{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-cell{min-height:84px;border-right:1px solid #ddd4bc;border-bottom:1px solid #ddd4bc;padding:6px 6px;position:relative;cursor:pointer;transition:background .15s}
+.cal-cell:nth-child(7n){border-right:none}
+.cal-cell:hover{background:#faf6ec}
+.cal-cell.today{background:rgba(200,168,75,.06)}
+.cal-cell.today .cal-date{color:var(--straw-d);font-weight:700}
+.cal-cell.other-month .cal-date{color:var(--muted)}
+.cal-date{font-family:'Courier Prime',monospace;font-size:11px;color:var(--mid);margin-bottom:3px}
+.cal-post{border-radius:2px;padding:2px 5px;margin-bottom:2px;font-size:10px;font-family:'Courier Prime',monospace;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;transition:opacity .15s}
+.cal-post:hover{opacity:.75}
+.cal-post.ig{background:rgba(200,168,75,.2);border-left:2px solid var(--straw);color:var(--straw-d)}
+.cal-post.tt{background:rgba(107,124,90,.15);border-left:2px solid var(--sage);color:var(--sage)}
+.cal-post.yt{background:rgba(139,32,32,.12);border-left:2px solid #cc4444;color:#8b2020}
+.cal-post .cp-t{color:rgba(90,70,40,.4);margin-right:3px}
+.cal-add-btn{position:absolute;bottom:4px;right:4px;background:transparent;border:1px solid #d4c8a8;color:var(--muted);font-size:12px;width:18px;height:18px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;opacity:0}
+.cal-cell:hover .cal-add-btn{opacity:1}
+.cal-add-btn:hover{border-color:var(--straw-d);color:var(--straw-d)}
+
+/* QUEUE */
+.sched-queue{padding:14px 18px;display:grid;gap:8px}
+.sq-item{background:var(--cream);border:1px solid #d4c8a8;border-radius:2px;padding:11px 12px;display:flex;align-items:flex-start;gap:10px;position:relative}
+.sq-item.ig{border-left:3px solid var(--straw)}
+.sq-item.tt{border-left:3px solid var(--sage)}
+.sq-item.yt{border-left:3px solid #cc4444}
+.sq-plat{font-size:16px;flex-shrink:0;margin-top:1px}
+.sq-info{flex:1;min-width:0}
+.sq-title{font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink);letter-spacing:1px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sq-meta{font-size:11px;color:var(--mid);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sq-time{font-family:'Courier Prime',monospace;font-size:11px;color:var(--straw-d);font-weight:700}
+.sq-badge{font-family:'Courier Prime',monospace;font-size:10px;padding:2px 6px;border-radius:1px;letter-spacing:1px}
+.sq-badge.ig{background:rgba(200,168,75,.2);color:var(--straw-d)}
+.sq-badge.tt{background:var(--green-dim);color:var(--sage)}
+.sq-badge.yt{background:rgba(139,32,32,.1);color:#8b2020}
+.sq-badge.status-draft{background:rgba(140,115,85,.15);color:var(--mid)}
+.sq-badge.status-ready{background:rgba(192,122,0,.12);color:var(--amber)}
+.sq-badge.status-approved{background:rgba(42,110,42,.12);color:var(--green)}
+.sq-ai-tag{font-size:10px;color:rgba(192,122,0,.7);font-family:'Courier Prime',monospace;letter-spacing:1px;font-style:italic}
+.sq-delete{position:absolute;top:6px;right:7px;background:transparent;border:none;color:var(--muted);font-size:14px;cursor:pointer;transition:color .15s;padding:2px 5px}
+.sq-delete:hover{color:var(--red)}
+.empty-queue{text-align:center;padding:32px 16px;font-family:'Courier Prime',monospace;font-size:11px;color:var(--muted);letter-spacing:2px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(58,46,26,.7);backdrop-filter:blur(8px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--warm);border:1px solid #d4c8a8;border-radius:4px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 10px 40px rgba(58,46,26,.2)}
+.modal::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--straw-d),var(--straw-l),var(--straw-d))}
+.modal-header{padding:16px 20px;border-bottom:1px solid #ddd4bc;display:flex;align-items:center;justify-content:space-between;background:var(--parch)}
+.modal-header h3{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--earth)}
+.modal-close{background:transparent;border:1px solid #d4c8a8;color:var(--mid);font-size:15px;width:26px;height:26px;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal-body{padding:20px;display:grid;gap:14px}
+.modal-footer{padding:14px 20px;border-top:1px solid #ddd4bc;display:flex;gap:8px;justify-content:flex-end;background:var(--parch)}
+.modal-btn{padding:9px 18px;border:none;font-family:'Playfair Display',serif;font-size:14px;font-weight:700;cursor:pointer;border-radius:2px;transition:all .2s}
+.modal-btn.primary{background:var(--earth);color:var(--straw-l)}.modal-btn.primary:hover{background:var(--soil);transform:translateY(-1px)}
+.modal-btn.secondary{background:transparent;border:1px solid #d4c8a8;color:var(--mid)}.modal-btn.secondary:hover{border-color:var(--straw-d);color:var(--straw-d)}
+.plt-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.plt-sel{border:1px solid #d4c8a8;background:var(--cream);padding:9px 6px;text-align:center;cursor:pointer;border-radius:2px;transition:all .15s;font-family:'Courier Prime',monospace;font-size:10px;letter-spacing:1px;color:var(--mid)}
+.plt-sel .ps-icon{display:block;font-size:18px;margin-bottom:3px}
+.plt-sel.sel-ig.selected{border-color:var(--straw-d);background:#faf4e0;color:var(--earth)}
+.plt-sel.sel-tt.selected{border-color:var(--sage);background:var(--green-dim);color:var(--sage)}
+.plt-sel.sel-yt.selected{border-color:#cc4444;background:rgba(139,32,32,.07);color:#8b2020}
+
+/* MISC */
+.empty-state{text-align:center;padding:50px 20px;background:var(--warm);border:1px solid var(--parch);border-radius:3px}
+.empty-state::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--straw-d),var(--straw-l),var(--straw-d));margin-bottom:0}
+.es-icon{font-size:36px;margin:20px 0 10px;opacity:.45}
+.empty-state p{font-family:'Courier Prime',monospace;font-size:11px;letter-spacing:2px;color:var(--muted)}
+.error-msg{background:rgba(139,32,32,.06);border:1px solid rgba(139,32,32,.2);color:#8b2020;padding:10px 14px;font-family:'Courier Prime',monospace;font-size:12px;border-radius:2px;letter-spacing:1px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--cream)}::-webkit-scrollbar-thumb{background:#c4b890;border-radius:2px}
+
+.nav-tab.active-eng{color:#7ab648;border-bottom-color:#7ab648}
+.nav-tab.active-guide{color:#7ab648;border-bottom-color:#7ab648;background:rgba(122,182,72,0.06)}
+</style>
+</head>
+<body>
+
+<div id="api-key-banner" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a0a00;border-bottom:2px solid #ff9500;padding:10px 16px;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono','Special Elite',monospace">
+  <span style="font-size:11px;color:#ff9500;letter-spacing:2px;white-space:nowrap">&#128273; API KEY</span>
+  <input type="password" id="api-key-input" placeholder="Paste your Anthropic API key here (sk-ant-...)" 
+    style="flex:1;background:#0d0d0d;border:1px solid #ff9500;color:#fff;padding:6px 10px;font-family:inherit;font-size:11px;border-radius:2px;outline:none"
+    oninput="saveKey(this.value)"/>
+  <button onclick="document.getElementById('api-key-banner').style.display='none'" 
+    style="background:#ff9500;border:none;color:#000;font-family:inherit;font-size:10px;padding:5px 10px;cursor:pointer;border-radius:2px;letter-spacing:1px">SAVE &amp; HIDE</button>
+  <span style="font-size:10px;color:#555;white-space:nowrap">Stored locally in your browser only</span>
+</div>
+<div id="api-key-spacer" style="height:50px"></div>
+<script>
+function saveKey(v){if(v)localStorage.setItem('ds_api_key',v);}
+(function(){
+  var k=localStorage.getItem('ds_api_key');
+  if(k){document.getElementById('api-key-input').value=k;document.getElementById('api-key-banner').style.display='none';document.getElementById('api-key-spacer').style.display='none';}
+})();
+function getApiKey(){return localStorage.getItem('ds_api_key')||document.getElementById('api-key-input').value||'';}
+</script>
+
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo-icon">🌾</div>
+    <div class="logo-text">Haymart</div>
+  </div>
+  <div class="header-sub"><span class="live-dot"></span>CLAUDE ACTIVE</div>
+  <div class="status-cluster">
+    <div class="region-tag">UK & EUROPE</div>
+  </div>
+</header>
+
+<div class="nav-bar">
+  <div class="nav-tab active-ig" id="tab-ig" onclick="switchView('ig')"><span>📸</span>INSTAGRAM</div>
+  <div class="nav-tab" id="tab-tt" onclick="switchView('tt')"><span>🎵</span>TIKTOK</div>
+  <div class="nav-tab" id="tab-yt" onclick="switchView('yt')"><span>▶️</span>YOUTUBE</div>
+  <div class="nav-divider"></div>
+  <div class="nav-tab" id="tab-eng" onclick="switchView('eng')"><span>&#128172;</span>ENGAGEMENT</div>
+  <div class="nav-tab" id="tab-guide" onclick="switchView('guide')"><span>?</span>GUIDE</div>
+  <div class="nav-tab" id="tab-cal" onclick="switchView('cal')"><span>📅</span>SCHEDULE</div>
+</div>
+
+<div class="main">
+
+<!-- INSTAGRAM -->
+<div id="view-ig">
+  <div class="panel ig-panel">
+    <div class="panel-header"><div class="ph-index" style="color:var(--straw-d)">IG</div><h2>Instagram Brief</h2></div>
+    <div class="panel-body">
+      <div><label>Post Format</label>
+        <div class="format-grid" id="ig-fmts">
+          <div class="fmt-card ig-active" data-fmt="Single Image"><span>📸</span>Image</div>
+          <div class="fmt-card" data-fmt="Reel"><span>🎬</span>Reel</div>
+          <div class="fmt-card" data-fmt="Carousel"><span>📋</span>Carousel</div>
+          <div class="fmt-card" data-fmt="Story"><span>⭕</span>Story</div>
+        </div>
+      </div>
+      <div>
+        <label>Image Source</label>
+        <div class="img-mode-row" id="ig-imgmode">
+          <button class="img-mode-btn active-real" data-m="real" onclick="setImgMode('ig','real',this)">📸 My Own Photo</button>
+          <button class="img-mode-btn" data-m="ai" onclick="setImgMode('ig','ai',this)">🤖 AI Generated</button>
+        </div>
+        <div id="ig-upload-wrap" style="margin-top:8px">
+          <div class="upload-hero">
+            <input type="file" accept="image/*,video/*" onchange="handleUpload(this,'ig')"/>
+            <div class="uh-icon" id="ig-uph-icon">📸</div>
+            <div class="uh-title" id="ig-uph-title">DROP YOUR FARM / PRODUCT PHOTO</div>
+            <div class="uh-sub" id="ig-uph-sub">Real countryside photography builds trust with buyers</div>
+            <img class="uh-preview" id="ig-preview"/>
+            <div class="uh-fn" id="ig-fn"></div>
+          </div>
+        </div>
+        <div id="ig-ai-gen-wrap" class="ai-gen-panel" style="margin-top:8px">
+          <div class="ai-gen-header">🤖 AI Image Generation — Prompts for External Tools</div>
+          <input type="text" id="ig-ai-concept" placeholder="Describe the image (e.g. golden hour hay bales Sussex countryside rolling hills)..." style="margin-bottom:8px"/>
+          <button class="ai-gen-btn" id="ig-aibtn" onclick="genAIPrompts('ig')">Generate Optimised Prompts</button>
+          <div id="ig-ai-results"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Topic / Product Focus</label><input type="text" id="ig-topic" placeholder="e.g. meadow hay bales, spring haylage delivery, new Sussex supplier..."/></div>
+        <div><label>Specific Text / CTA</label><input type="text" id="ig-cta" placeholder="e.g. price, region, delivery offer, link in bio..."/></div>
+      </div>
+      <div><label>Content Angle</label>
+        <div class="tag-row" id="ig-ctags">
+          <div class="ctag active" data-v="product showcase">PRODUCT</div>
+          <div class="ctag" data-v="new supplier listing">NEW SUPPLIER</div>
+          <div class="ctag" data-v="seasonal availability">SEASONAL</div>
+          <div class="ctag" data-v="delivery & logistics">DELIVERY</div>
+          <div class="ctag" data-v="equestrian horse owners">EQUESTRIAN</div>
+          <div class="ctag" data-v="farm to buyer community">COMMUNITY</div>
+          <div class="ctag" data-v="platform launch awareness">PLATFORM</div>
+          <div class="ctag" data-v="countryside lifestyle">COUNTRYSIDE</div>
+        </div>
+      </div>
+      <div><label>Caption Tone</label>
+        <div class="tag-row" id="ig-tone">
+          <div class="tone-btn active" data-v="trusted & practical">Trusted & Practical</div>
+          <div class="tone-btn" data-v="warm & community">Warm & Community</div>
+          <div class="tone-btn" data-v="educational & informative">Educational</div>
+          <div class="tone-btn" data-v="promotional & urgent">Promotional</div>
+          <div class="tone-btn" data-v="seasonal & timely">Seasonal</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Extra Notes</label><textarea id="ig-notes" placeholder="e.g. mention free local delivery, Sussex suppliers, target horse owners, small bales available..."></textarea></div>
+        <div><label>AI Disclosure</label>
+          <div class="ai-disclosure-box">
+            <label class="ai-toggle"><input type="checkbox" id="ig-aicheck" onchange="toggleDisc('ig')"/><span class="ai-slider"></span></label>
+            <div>
+              <div class="ai-disc-label"><strong>AI-Generated Image</strong><br/>Toggle if imagery is AI-made. Transparency builds trust with farmers and buyers.</div>
+              <div class="ai-disc-preview" id="ig-disc-preview">#AIGenerated 🤖 — will be appended</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="gen-btn" id="ig-btn" onclick="generate('ig')">Generate Instagram Content<div class="progress" id="ig-prog"></div></button>
+    </div>
+  </div>
+  <div id="ig-output" style="margin-top:14px"><div class="empty-state"><div class="es-icon">🌾</div><p>COMPLETE THE BRIEF — GENERATE YOUR POST</p></div></div>
+</div>
+
+<!-- TIKTOK -->
+<div id="view-tt" style="display:none">
+  <div class="panel tt-panel">
+    <div class="panel-header"><div class="ph-index" style="color:var(--sage)">TT</div><h2>TikTok Brief</h2></div>
+    <div class="panel-body">
+      <div><label>Video Format</label>
+        <div class="format-grid" id="tt-fmts">
+          <div class="fmt-card tt-active" data-fmt="Short Video (15–30s)"><span>⚡</span>Short (15–30s)</div>
+          <div class="fmt-card" data-fmt="Standard TikTok (60s)"><span>🎬</span>Standard (60s)</div>
+          <div class="fmt-card" data-fmt="Long Form (3–5 min)"><span>📹</span>Long Form</div>
+          <div class="fmt-card" data-fmt="Farm Tour / Walk"><span>🚜</span>Farm Tour</div>
+          <div class="fmt-card" data-fmt="TikTok Live"><span>🔴</span>Live</div>
+        </div>
+      </div>
+      <div>
+        <label>Video / Cover Source</label>
+        <div class="img-mode-row" id="tt-imgmode">
+          <button class="img-mode-btn active-real" data-m="real" onclick="setImgMode('tt','real',this)">📸 My Own Video / Photo</button>
+          <button class="img-mode-btn" data-m="ai" onclick="setImgMode('tt','ai',this)">🤖 AI Generated Cover</button>
+        </div>
+        <div id="tt-upload-wrap" style="margin-top:8px">
+          <div class="upload-hero">
+            <input type="file" accept="image/*,video/*" onchange="handleUpload(this,'tt')"/>
+            <div class="uh-icon" id="tt-uph-icon">🎬</div>
+            <div class="uh-title" id="tt-uph-title">DROP YOUR FARM VIDEO OR COVER</div>
+            <div class="uh-sub" id="tt-uph-sub">Authentic farm footage — hugely popular on agricultural TikTok</div>
+            <img class="uh-preview" id="tt-preview"/>
+            <div class="uh-fn" id="tt-fn"></div>
+          </div>
+        </div>
+        <div id="tt-ai-gen-wrap" class="ai-gen-panel" style="margin-top:8px">
+          <div class="ai-gen-header">🤖 AI Cover Generation — Prompts for External Tools</div>
+          <input type="text" id="tt-ai-concept" placeholder="Describe the cover (e.g. tractor at golden hour English countryside bales)..." style="margin-bottom:8px"/>
+          <button class="ai-gen-btn" id="tt-aibtn" onclick="genAIPrompts('tt')">Generate Optimised Prompts</button>
+          <div id="tt-ai-results"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Video Concept</label><input type="text" id="tt-topic" placeholder="e.g. how to choose the right hay for your horse, first cut meadow hay season..."/></div>
+        <div><label>Opening Hook Idea</label><input type="text" id="tt-hook" placeholder="e.g. 'Most horse owners are buying the wrong hay...'"/></div>
+      </div>
+      <div><label>Content Angle</label>
+        <div class="tag-row" id="tt-ctags">
+          <div class="ctag active" data-v="educational hay / forage">HAY EDUCATION</div>
+          <div class="ctag" data-v="farm life authentic">FARM LIFE</div>
+          <div class="ctag" data-v="horse owner tips">HORSE TIPS</div>
+          <div class="ctag" data-v="seasonal forage availability">SEASONAL</div>
+          <div class="ctag" data-v="haymart platform explainer">HAYMART</div>
+          <div class="ctag" data-v="supplier story">SUPPLIER STORY</div>
+          <div class="ctag" data-v="price & value">PRICE & VALUE</div>
+        </div>
+      </div>
+      <div><label>Tone / Energy</label>
+        <div class="tag-row" id="tt-tone">
+          <div class="tone-btn active" data-v="practical & knowledgeable">Practical & Knowledgeable</div>
+          <div class="tone-btn" data-v="warm & authentic farm life">Warm Farm Life</div>
+          <div class="tone-btn" data-v="educational & eye-opening">Educational</div>
+          <div class="tone-btn" data-v="community & countryside">Community</div>
+          <div class="tone-btn" data-v="punchy & informative">Punchy</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Extra Notes</label><textarea id="tt-notes" placeholder="e.g. mention free delivery, focus on Sussex/Kent, target equestrian community..."></textarea></div>
+        <div><label>AI Disclosure</label>
+          <div class="ai-disclosure-box">
+            <label class="ai-toggle"><input type="checkbox" id="tt-aicheck" onchange="toggleDisc('tt')"/><span class="ai-slider"></span></label>
+            <div>
+              <div class="ai-disc-label"><strong>AI-Generated Visual</strong><br/>Toggle if cover art is AI-generated.</div>
+              <div class="ai-disc-preview" id="tt-disc-preview">#AIGenerated 🤖 — will be appended</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="gen-btn" style="background:var(--sage)" id="tt-btn" onclick="generate('tt')">Generate TikTok Content<div class="progress" id="tt-prog"></div></button>
+    </div>
+  </div>
+  <div id="tt-output" style="margin-top:14px"><div class="empty-state"><div class="es-icon">🌾</div><p>COMPLETE THE BRIEF — GENERATE YOUR POST</p></div></div>
+</div>
+
+<!-- YOUTUBE -->
+<div id="view-yt" style="display:none">
+  <div class="panel yt-panel">
+    <div class="panel-header"><div class="ph-index" style="color:#8b2020;border-color:#cc4444">YT</div><h2>YouTube Brief</h2></div>
+    <div class="panel-body">
+      <div><label>Content Type</label>
+        <div class="format-grid" id="yt-fmts">
+          <div class="fmt-card yt-active" data-fmt="Standard Upload"><span>⬆️</span>Upload</div>
+          <div class="fmt-card" data-fmt="YouTube Shorts"><span>⚡</span>Shorts</div>
+          <div class="fmt-card" data-fmt="Live Stream"><span>🔴</span>Live Stream</div>
+          <div class="fmt-card" data-fmt="Farm Tour Video"><span>🚜</span>Farm Tour</div>
+          <div class="fmt-card" data-fmt="Community Post"><span>📢</span>Community</div>
+        </div>
+      </div>
+      <div>
+        <label>Thumbnail Source</label>
+        <div class="img-mode-row" id="yt-imgmode">
+          <button class="img-mode-btn active-real" data-m="real" onclick="setImgMode('yt','real',this)">📸 My Own Thumbnail</button>
+          <button class="img-mode-btn" data-m="ai" onclick="setImgMode('yt','ai',this)">🤖 AI Generated Thumbnail</button>
+        </div>
+        <div id="yt-upload-wrap" style="margin-top:8px">
+          <div class="upload-hero">
+            <input type="file" accept="image/*,video/*" onchange="handleUpload(this,'yt')"/>
+            <div class="uh-icon" id="yt-uph-icon">▶️</div>
+            <div class="uh-title" id="yt-uph-title">DROP YOUR THUMBNAIL OR VIDEO STILL</div>
+            <div class="uh-sub" id="yt-uph-sub">Real farm imagery — authentic content ranks and converts better</div>
+            <img class="uh-preview" id="yt-preview"/>
+            <div class="uh-fn" id="yt-fn"></div>
+          </div>
+        </div>
+        <div id="yt-ai-gen-wrap" class="ai-gen-panel" style="margin-top:8px">
+          <div class="ai-gen-header">🤖 AI Thumbnail Generation — Prompts for External Tools</div>
+          <input type="text" id="yt-ai-concept" placeholder="Describe your thumbnail (e.g. sunlit hay barn English countryside warm tones)..." style="margin-bottom:8px"/>
+          <button class="ai-gen-btn" id="yt-aibtn" onclick="genAIPrompts('yt')">Generate Optimised Prompts</button>
+          <div id="yt-ai-results"></div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Video Topic</label><input type="text" id="yt-topic" placeholder="e.g. complete guide to buying hay, Haymart platform walkthrough, farm visit tour..."/></div>
+        <div><label>Target Keywords (SEO)</label><input type="text" id="yt-kw" placeholder="e.g. hay for horses UK, buy haylage online, forage marketplace..."/></div>
+      </div>
+      <div><label>Content Angle</label>
+        <div class="tag-row" id="yt-ctags">
+          <div class="ctag active" data-v="buyer guide / how to">BUYER GUIDE</div>
+          <div class="ctag" data-v="platform walkthrough">PLATFORM WALKTHROUGH</div>
+          <div class="ctag" data-v="farm visit / supplier story">FARM VISIT</div>
+          <div class="ctag" data-v="equestrian care education">EQUESTRIAN EDU</div>
+          <div class="ctag" data-v="seasonal forage planning">SEASONAL PLANNING</div>
+          <div class="ctag" data-v="price comparison & value">PRICE GUIDE</div>
+        </div>
+      </div>
+      <div><label>Video Length</label>
+        <div class="tag-row" id="yt-length">
+          <div class="tone-btn" data-v="YouTube Shorts under 60s">Shorts</div>
+          <div class="tone-btn active" data-v="5–15 minute educational">5–15 Min</div>
+          <div class="tone-btn" data-v="15–30 minute guide">15–30 Min</div>
+          <div class="tone-btn" data-v="live stream Q&A">Live Q&A</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div><label>Extra Notes</label><textarea id="yt-notes" placeholder="e.g. mention Haymart.co.uk, 8% commission model, AI customer service, UK & Europe focus..."></textarea></div>
+        <div><label>AI Disclosure</label>
+          <div class="ai-disclosure-box">
+            <label class="ai-toggle"><input type="checkbox" id="yt-aicheck" onchange="toggleDisc('yt')"/><span class="ai-slider"></span></label>
+            <div>
+              <div class="ai-disc-label"><strong>AI-Generated Thumbnail</strong><br/>Toggle if thumbnail is AI-generated.</div>
+              <div class="ai-disc-preview" id="yt-disc-preview">#AIGenerated 🤖 — will be noted in description</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="gen-btn" style="background:#8b2020;color:var(--straw-l)" id="yt-btn" onclick="generate('yt')">Generate YouTube Content<div class="progress" id="yt-prog"></div></button>
+    </div>
+  </div>
+  <div id="yt-output" style="margin-top:14px"><div class="empty-state"><div class="es-icon">🌾</div><p>COMPLETE THE BRIEF — GENERATE YOUR POST</p></div></div>
+</div>
+
+
+<div id="view-eng" style="display:none">
+  <div style="background:var(--paper,#111);border:2px solid #7ab648;border-radius:2px;overflow:hidden;box-shadow:4px 4px 0 rgba(0,0,0,0.2)">
+    <div style="background:var(--ink,#0d0d0d);padding:10px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid #7ab648">
+      <span style="font-family:Share Tech Mono,monospace;font-size:10px;color:#7ab648;letter-spacing:3px">ENG</span>
+      <h2 style="font-family:'Bebas Neue','Righteous',sans-serif;font-size:15px;color:var(--paper,#fff);letter-spacing:3px;text-transform:uppercase;flex:1">ENGAGEMENT HUB</h2>
+      <span style="font-family:Share Tech Mono,monospace;font-size:9px;color:var(--muted,#555);letter-spacing:2px">DRAFT &amp; SEND — NOT A BOT</span>
+    </div>
+
+    <div style="display:flex;border-bottom:1px solid var(--border,#1a1a1a);background:var(--deep,#0d0d0d);overflow-x:auto;scrollbar-width:none">
+      <div id="engt-dm" onclick="engTab('dm')" style="padding:10px 14px;cursor:pointer;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:#7ab648;border-bottom:2px solid #7ab648;white-space:nowrap;user-select:none">&#128172; NEW FOLLOWER DM</div>
+      <div id="engt-comment" onclick="engTab('comment')" style="padding:10px 14px;cursor:pointer;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--ec-dim,#555);border-bottom:2px solid transparent;white-space:nowrap;user-select:none">&#128173; COMMENT DRAFTS</div>
+      <div id="engt-like" onclick="engTab('like')" style="padding:10px 14px;cursor:pointer;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--ec-dim,#555);border-bottom:2px solid transparent;white-space:nowrap;user-select:none">&#10084; LIKE STRATEGY</div>
+      <div id="engt-reply" onclick="engTab('reply')" style="padding:10px 14px;cursor:pointer;font-family:Share Tech Mono,monospace;font-size:10px;letter-spacing:2px;color:var(--ec-dim,#555);border-bottom:2px solid transparent;white-space:nowrap;user-select:none">&#8617; REPLY TEMPLATES</div>
+      <div id="engt-info" onclick="engTab('info')" style="padding:10px 14px;cursor:pointer;font-family:Share Tech Mono,Special Elite,monospace;font-size:10px;letter-spacing:2px;color:var(--ec-dim,#555);border-bottom:2px solid transparent;white-space:nowrap;user-select:none">&#9432; GUIDE</div>
+    </div>
+
+    <!-- DM -->
+    <div id="engv-dm" style="padding:16px;display:grid;gap:13px">
+      <div style="background:rgba(122,182,72,0.06);border:1px solid #7ab64844;border-radius:1px;padding:9px 13px;font-family:Share Tech Mono,monospace;font-size:10px;color:var(--mid,#666);letter-spacing:1px;line-height:1.7">&#9888; These are <strong style="color:#7ab648">draft templates</strong> — copy, personalise slightly, and send manually. Automated mass-DMs violate platform Terms of Service and risk account bans.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div><label>Platform</label><select id="eng-dm-plat"><option>Instagram</option><option>TikTok</option><option>Facebook</option></select></div>
+        <div><label>New Follower Type</label><select id="eng-dm-type"><option>Music fan / listener</option><option>Fellow artist / producer</option><option>Industry / label contact</option><option>Local / scene person</option><option>General new follower</option></select></div>
+      </div>
+      <div><label>Context (optional)</label><input type="text" id="eng-dm-ctx" placeholder="e.g. they commented on my last post, they're also in the scene, they found me via Dubscribe..."/></div>
+      <div><label>Tone</label>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="eng-dm-tone">
+          <div class="chip on" data-t="warm and genuine" onclick="engChip(this,'eng-dm-tone')">WARM</div>
+          <div class="chip" data-t="hype and excited" onclick="engChip(this,'eng-dm-tone')">HYPE</div>
+          <div class="chip" data-t="casual and brief" onclick="engChip(this,'eng-dm-tone')">CASUAL</div>
+          <div class="chip" data-t="community focused" onclick="engChip(this,'eng-dm-tone')">COMMUNITY</div>
+        </div>
+      </div>
+      <button class="gen-btn" id="eng-dm-btn" onclick="generateEng('dm')" style="background:rgba(122,182,72,0.06);color:#7ab648;border:1px solid #7ab648;box-shadow:0 0 10px #7ab64833;position:relative">GENERATE DM TEMPLATES<div class="progress" id="eng-dm-prog"></div></button>
+      <div id="eng-dm-out"></div>
+    </div>
+
+    <!-- COMMENTS -->
+    <div id="engv-comment" style="padding:16px;display:none;gap:13px">
+      <div style="background:rgba(122,182,72,0.06);border:1px solid #7ab64844;border-radius:1px;padding:9px 13px;font-family:Share Tech Mono,monospace;font-size:10px;color:var(--mid,#666);letter-spacing:1px;line-height:1.7">&#128161; Genuine comments on <strong style="color:#7ab648">other accounts' posts</strong> — the best organic growth method. Copy and post manually, 20-30 per day.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div><label>Platform</label><select id="eng-com-plat"><option>Instagram</option><option>TikTok</option><option>Facebook</option></select></div>
+        <div><label>Account Type to Comment On</label><select id="eng-com-type"><option>Fellow artist in same genre</option><option>Promoter / event page</option><option>Label / record store</option><option>Music journalist / blogger</option><option>Venue / club</option><option>Fan account</option></select></div>
+      </div>
+      <div><label>Post Topic (what they posted about)</label><input type="text" id="eng-com-topic" placeholder="e.g. new release, festival lineup, studio session, throwback post..."/></div>
+      <div><label>Number of Variants</label>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="eng-com-qty"><div class="chip" data-t="3" onclick="engChip(this,'eng-com-qty')">3</div><div class="chip  on" data-t="5" onclick="engChip(this,'eng-com-qty')">5</div><div class="chip" data-t="8" onclick="engChip(this,'eng-com-qty')">8</div><div class="chip" data-t="10" onclick="engChip(this,'eng-com-qty')">10</div></div>
+      </div>
+      <button class="gen-btn" id="eng-com-btn" onclick="generateEng('comment')" style="background:rgba(122,182,72,0.06);color:#7ab648;border:1px solid #7ab648;box-shadow:0 0 10px #7ab64833;position:relative">GENERATE COMMENT DRAFTS<div class="progress" id="eng-com-prog"></div></button>
+      <div id="eng-com-out"></div>
+    </div>
+
+    <!-- LIKE STRATEGY -->
+    <div id="engv-like" style="padding:16px;display:none;gap:13px">
+      <div style="background:rgba(122,182,72,0.06);border:1px solid #7ab64844;border-radius:1px;padding:9px 13px;font-family:Share Tech Mono,monospace;font-size:10px;color:var(--mid,#666);letter-spacing:1px;line-height:1.7">&#128203; A <strong style="color:#7ab648">daily manual engagement routine</strong> — which accounts to interact with and how. 20-30 mins per day done consistently beats any bot.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div><label>Platform</label><select id="eng-like-plat"><option>Instagram</option><option>TikTok</option><option>Facebook</option></select></div>
+        <div><label>Current Follower Count</label><select id="eng-like-size"><option>Under 1K</option><option>1K-5K</option><option>5K-20K</option><option>20K-100K</option><option>100K+</option></select></div>
+      </div>
+      <div><label>Growth Goal</label>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="eng-like-goal">
+          <div class="chip on" data-t="grow follower count fast" onclick="engChip(this,'eng-like-goal')">GROW FAST</div>
+          <div class="chip" data-t="build deep scene relationships" onclick="engChip(this,'eng-like-goal')">DEEP RELATIONS</div>
+          <div class="chip" data-t="find collaborators and contacts" onclick="engChip(this,'eng-like-goal')">FIND COLLABS</div>
+          <div class="chip" data-t="drive traffic to content and releases" onclick="engChip(this,'eng-like-goal')">DRIVE TRAFFIC</div>
+        </div>
+      </div>
+      <button class="gen-btn" id="eng-like-btn" onclick="generateEng('like')" style="background:rgba(122,182,72,0.06);color:#7ab648;border:1px solid #7ab648;box-shadow:0 0 10px #7ab64833;position:relative">GENERATE ENGAGEMENT STRATEGY<div class="progress" id="eng-like-prog"></div></button>
+      <div id="eng-like-out"></div>
+    </div>
+
+    <!-- REPLY TEMPLATES -->
+    <div id="engv-reply" style="padding:16px;display:none;gap:13px">
+      <div style="background:rgba(122,182,72,0.06);border:1px solid #7ab64844;border-radius:1px;padding:9px 13px;font-family:Share Tech Mono,monospace;font-size:10px;color:var(--mid,#666);letter-spacing:1px;line-height:1.7">&#8617; Ready-to-use reply templates for <strong style="color:#7ab648">comments on your own posts</strong> — copy and post, or tweak first.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+        <div><label>Comment Type</label><select id="eng-rep-type"><option>Positive / hype comment</option><option>Question about music or release</option><option>Question about bookings</option><option>Criticism or negative comment</option><option>Collab request</option><option>Emoji only reaction</option><option>Fan saying thank you</option></select></div>
+        <div><label>Platform</label><select id="eng-rep-plat"><option>Instagram</option><option>TikTok</option><option>Facebook</option></select></div>
+      </div>
+      <div><label>The Comment You Received (optional)</label><input type="text" id="eng-rep-comment" placeholder="Paste the actual comment for a tailored reply, or leave blank for generic templates..."/></div>
+      <button class="gen-btn" id="eng-rep-btn" onclick="generateEng('reply')" style="background:rgba(122,182,72,0.06);color:#7ab648;border:1px solid #7ab648;box-shadow:0 0 10px #7ab64833;position:relative">GENERATE REPLY TEMPLATES<div class="progress" id="eng-rep-prog"></div></button>
+      <div id="eng-rep-out"></div>
+    </div>
+<div id="engv-info" style="padding:16px;display:none;gap:0"><div style="background:#111;border:1px solid #222;border-radius:1px;overflow:hidden;margin-bottom:12px"><div style="padding:9px 14px;background:#0d0d0d;border-bottom:1px solid #222;display:flex;align-items:center;gap:8px"><span style="font-size:16px">✅</span><span style="font-family:Share Tech Mono,Special Elite,monospace;font-size:11px;letter-spacing:2px;color:#4caf50;text-transform:uppercase;font-weight:700">Legitimate — Safe &amp; Effective</span></div><div style="padding:0 14px 4px"><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">💬</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Manual DMs to new followers</div><div style="font-size:12px;color:#888;line-height:1.6">Perfectly fine on every platform. The templates are starting points — tweak a detail for each person. Platforms allow this because it is genuine human behaviour.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">💭</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Commenting on other posts</div><div style="font-size:12px;color:#888;line-height:1.6">The highest-ROI engagement activity available. Thoughtful comments in your niche get you seen by the account owner AND their audience. 20–30 per day manually is safe and effective.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">❤️</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Liking posts manually</div><div style="font-size:12px;color:#888;line-height:1.6">Completely fine. Stay under ~150 likes per day to avoid temporary action blocks. The strategy tool keeps you well within this.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">↩️</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Replying to your own comments</div><div style="font-size:12px;color:#888;line-height:1.6">Not just allowed — platforms actively reward it. Replying within the first hour of posting significantly boosts algorithmic reach. Always reply to everyone.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">👥</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Following accounts in your niche</div><div style="font-size:12px;color:#888;line-height:1.6">Fine manually. Stay under 100–150 new follows per day. Do not immediately unfollow — follow/unfollow churning is detectable and against the rules.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">📅</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Third-party post schedulers (Buffer, Later, Hootsuite)</div><div style="font-size:12px;color:#888;line-height:1.6">Officially sanctioned by Meta and TikTok via their APIs. Scheduling posts is fine. Scheduling engagement actions (likes, comments) is not.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">🤖</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">ManyChat / chatbot DMs triggered by the user</div><div style="font-size:12px;color:#888;line-height:1.6">Meta-approved when the user initiates the interaction — e.g. "Comment TICKETS to get the link." Unprompted automated DMs are not allowed.</div></div></div></div></div><div style="background:#111;border:1px solid #222;border-radius:1px;overflow:hidden;margin-bottom:12px"><div style="padding:9px 14px;background:#0d0d0d;border-bottom:1px solid #222;display:flex;align-items:center;gap:8px"><span style="font-size:16px">❌</span><span style="font-family:Share Tech Mono,Special Elite,monospace;font-size:11px;letter-spacing:2px;color:#ff3b3b;text-transform:uppercase;font-weight:700">Not Allowed — Can Get You Banned</span></div><div style="padding:0 14px 4px"><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">🤖</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Automated liking, commenting, following or DMing</div><div style="font-size:12px;color:#888;line-height:1.6">Violates Terms of Service on every platform. Meta, TikTok and YouTube have dedicated ML systems to detect non-human behaviour patterns. Penalties range from temporary blocks to permanent removal.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">💸</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Buying followers or engagement</div><div style="font-size:12px;color:#888;line-height:1.6">Against the rules everywhere, and counterproductive. Fake followers do not engage — this tanks your engagement rate and tells the algorithm your content is low quality. Platforms purge fake accounts regularly.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">📨</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Mass identical DMs sent manually</div><div style="font-size:12px;color:#888;line-height:1.6">Even sent by hand, sending the exact same message to hundreds of people in a short window gets flagged as spam. The tool generates 5 variants so you always rotate.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">🔄</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Comment pods and coordinated engagement groups</div><div style="font-size:12px;color:#888;line-height:1.6">Groups where members agree to like and comment on demand. Instagram has been actively suppressing these since 2022 and the behaviour is explicitly prohibited.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">🔁</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Posting identical comments repeatedly</div><div style="font-size:12px;color:#888;line-height:1.6">If the same comment text appears across multiple posts in a session, it is treated as spam. Always use different variants from the tool.</div></div></div></div></div><div style="background:#111;border:1px solid #222;border-radius:1px;overflow:hidden;margin-bottom:12px"><div style="padding:9px 14px;background:#0d0d0d;border-bottom:1px solid #222;display:flex;align-items:center;gap:8px"><span style="font-size:16px">⚠️</span><span style="font-family:Share Tech Mono,Special Elite,monospace;font-size:11px;letter-spacing:2px;color:#ff9500;text-transform:uppercase;font-weight:700">Grey Zone — Proceed With Caution</span></div><div style="padding:0 14px 4px"><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">🔄</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Follow / unfollow strategies</div><div style="font-size:12px;color:#888;line-height:1.6">Technically allowed if done slowly and manually, but bad practice. People notice and it creates a poor impression. Not recommended.</div></div></div><div style="display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #222"><span style="font-size:14px;flex-shrink:0">📊</span><div><div style="font-size:13px;font-weight:700;color:#ccc;margin-bottom:2px">Engagement rate gaming</div><div style="font-size:12px;color:#888;line-height:1.6">Artificially inflating metrics through any coordinated means undermines long-term growth and can trigger algorithmic suppression even if no rules are explicitly broken.</div></div></div></div></div><div style="background:rgba(200,255,0,0.05);border:1px solid rgba(200,255,0,0.2);border-radius:1px;padding:14px;margin-top:4px"><div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:10px;color:#c8ff00;letter-spacing:2px;margin-bottom:8px">THE BOTTOM LINE</div><div style="font-size:13px;color:#ccc;line-height:1.8">The engagement hub is built around the one approach that <strong style="color:#c8ff00">always works and never gets accounts banned</strong>: showing up as a real person, consistently, every day. 20–30 minutes of genuine manual engagement per day — leaving real comments, replying to everyone, sending personal DMs to new followers — will outperform any bot strategy within 60–90 days, and the results compound over time.</div><div style="font-size:12px;color:#888;margin-top:8px;line-height:1.6">Algorithms on every platform are specifically designed to reward human behaviour. The tool removes the friction of thinking what to write — <em>the sending is always you.</em></div></div></div>
+
+  </div>
+</div>
+<!-- CALENDAR -->
+
+<div id="view-guide" style="display:none">
+  <div style="background:var(--card, #111);border:2px solid rgb(122,182,72);border-radius:4px;overflow:hidden;box-shadow:3px 3px 0 rgba(0,0,0,0.3)">
+    <div style="background:var(--deep, #0d0d0d);padding:10px 18px;display:flex;align-items:center;gap:10px;border-bottom:2px solid rgb(122,182,72)">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgb(122,182,72);letter-spacing:3px">GUIDE</span>
+      <h2 style="font-family:Bebas Neue,sans-serif;font-size:15px;color:#fff;letter-spacing:3px;text-transform:uppercase;flex:1">HOW TO USE — HAYMART</h2>
+    </div>
+    <div style="padding:20px;display:grid;gap:16px">
+
+      <div style="background:var(--card, #111);border:1px solid var(--border, #222);border-radius:4px;overflow:hidden">
+        <div style="padding:9px 14px;background:var(--deep, #0d0d0d);border-bottom:1px solid var(--border, #222)">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;font-weight:700">&#128640; Getting Started</span>
+        </div>
+        <div style="padding:14px">
+          <div style="display:flex;gap:11px;margin-bottom:12px">
+            <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:rgb(122,182,72);line-height:1;min-width:24px;flex-shrink:0">1</div>
+            <div><div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:3px">Open the tool</div><div style="font-size:13px;color:#b0d0e8;line-height:1.7">Open this file in any browser — Chrome, Safari, Firefox. Works on phone, tablet, or desktop. Needs internet only when generating content with Claude AI.</div></div>
+          </div>
+          <div style="display:flex;gap:11px;margin-bottom:12px">
+            <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:rgb(122,182,72);line-height:1;min-width:24px;flex-shrink:0">2</div>
+            <div><div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:3px">Navigate the tabs</div><div style="font-size:13px;color:#b0d0e8;line-height:1.7">Use the tabs at the top to move between sections: <strong style="color:rgb(122,182,72)">Instagram · TikTok · Facebook · Engagement · Schedule</strong>. Each tab is self-contained — fill in the brief, hit Generate, copy your content.</div></div>
+          </div>
+          <div style="display:flex;gap:11px">
+            <div style="font-family:Bebas Neue,sans-serif;font-size:20px;color:rgb(122,182,72);line-height:1;min-width:24px;flex-shrink:0">3</div>
+            <div><div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:3px">Generate content</div><div style="font-size:13px;color:#b0d0e8;line-height:1.7">Fill in the brief fields — topic, format, tone. The more detail you give, the better the output. Hit the Generate button. Claude writes everything — copy it, tweak it if needed, post it.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card, #111);border:1px solid var(--border, #222);border-radius:4px;overflow:hidden">
+        <div style="padding:9px 14px;background:var(--deep, #0d0d0d);border-bottom:1px solid var(--border, #222)">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;font-weight:700">&#128200; Content Tabs — What Each Does</span>
+        </div>
+        <div style="padding:14px;display:grid;gap:10px">
+          <div style="padding:10px 12px;background:rgba(122,182,72,0.05);border:1px solid rgba(122,182,72,0.25);border-radius:4px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:5px">&#9998; Platform Generators (IG / TikTok / YouTube)</div>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7">Generate fully formatted captions, hashtags, best posting times, and engagement comments for each platform. Outputs are tailored to each platform's algorithm and format requirements.</div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(122,182,72,0.05);border:1px solid rgba(122,182,72,0.25);border-radius:4px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:5px">&#128308; Live Stream Planner</div>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7">Generates a complete live stream pack — announcement post, day-of hype, go-live caption, stream title, pinned comment, chat prompts, opening script, and post-live thank you. Works for IG Live, TikTok Live, and YouTube Live.</div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(122,182,72,0.05);border:1px solid rgba(122,182,72,0.25);border-radius:4px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:5px">&#128172; Engagement Hub</div>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7">Four tools: DM templates for new followers, comment drafts for other accounts' posts, a daily like/engagement strategy, and reply templates for comments on your own posts. See the Guide sub-tab for what's allowed and what isn't.</div>
+          </div>
+          <div style="padding:10px 12px;background:rgba(122,182,72,0.05);border:1px solid rgba(122,182,72,0.25);border-radius:4px">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;margin-bottom:5px">&#128197; Schedule / Calendar</div>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7">Plan your content calendar. Add posts with dates and times, set status (Draft / Ready / Approved), and keep track of what's going out when. Data saves in your browser — it persists between sessions on the same device.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--card, #111);border:1px solid var(--border, #222);border-radius:4px;overflow:hidden">
+        <div style="padding:9px 14px;background:var(--deep, #0d0d0d);border-bottom:1px solid var(--border, #222)">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;color:rgb(122,182,72);text-transform:uppercase;font-weight:700">&#9888; Important — What This Tool Does and Doesn't Do</span>
+        </div>
+        <div style="padding:14px;display:grid;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border, #222)">
+            <span style="font-size:16px;flex-shrink:0">&#10003;</span>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7"><strong style="color:rgb(122,182,72)">Generates content</strong> — captions, hashtags, scripts, DMs, strategies. Everything is AI-written and ready to copy.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border, #222)">
+            <span style="font-size:16px;flex-shrink:0">&#10003;</span>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7"><strong style="color:rgb(122,182,72)">Saves your schedule</strong> — the calendar saves to your browser's local storage. Don't clear your browser data or it will reset.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border, #222)">
+            <span style="font-size:16px;flex-shrink:0">&#10007;</span>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7"><strong style="color:rgb(122,182,72)">Does NOT post automatically</strong> — you copy the content and post it yourself. This is intentional — automated posting bots violate platform Terms of Service.</div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0">
+            <span style="font-size:16px;flex-shrink:0">&#10007;</span>
+            <div style="font-size:13px;color:#b0d0e8;line-height:1.7"><strong style="color:rgb(122,182,72)">Does NOT automate engagement</strong> — DMs, likes, and comments are drafted for you to send manually. See Engagement Hub &#8594; Guide for the full rules.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(122,182,72,0.05);border:1px solid rgba(122,182,72,0.3);border-radius:4px;padding:14px">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:rgb(122,182,72);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase">&#128161; Quick Tips</div>
+        <div style="display:grid;gap:6px">
+          <div style="font-size:13px;color:#b0d0e8;line-height:1.6">&#8226; The more specific your brief, the better the output — "Saturday gig at Napton Victory Club, first time back since lockdown" beats "Saturday gig"</div>
+          <div style="font-size:13px;color:#b0d0e8;line-height:1.6">&#8226; Generate several versions and pick the best one — each generation gives slightly different results</div>
+          <div style="font-size:13px;color:#b0d0e8;line-height:1.6">&#8226; Always add your own voice — Claude gets you 80% there, a small personal tweak makes it 100%</div>
+          <div style="font-size:13px;color:#b0d0e8;line-height:1.6">&#8226; Post at the suggested times — they're calculated for your specific audience</div>
+          <div style="font-size:13px;color:#b0d0e8;line-height:1.6">&#8226; Consistency beats perfection — posting regularly with good-enough content outperforms posting occasionally with perfect content</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="view-cal" style="display:none">
+  <div class="panel cal-panel">
+    <div class="cal-toolbar">
+      <button class="cal-nav-btn" onclick="calNav(-1)">◀</button>
+      <div class="cal-month-label" id="calLabel"></div>
+      <button class="cal-nav-btn" onclick="calNav(1)">▶</button>
+      <button class="gen-btn" style="width:auto;padding:8px 16px;font-size:13px;letter-spacing:1px;margin-left:8px" onclick="openModal(null)">+ Schedule Post</button>
+    </div>
+    <div id="calDayNames" class="cal-header-row"></div>
+    <div id="calBody" class="cal-body"></div>
+  </div>
+  <div class="panel cal-panel" style="margin-top:14px">
+    <div class="panel-header"><div class="ph-index">📋</div><h2>Scheduled Queue</h2></div>
+    <div id="schedQueue" class="sched-queue"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div id="schedModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header"><h3>Schedule Post</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div><label>Platform</label>
+        <div class="plt-row" id="mPlatform">
+          <div class="plt-sel sel-ig selected" data-p="ig" onclick="selPlt(this)"><span class="ps-icon">📸</span>INSTAGRAM</div>
+          <div class="plt-sel sel-tt" data-p="tt" onclick="selPlt(this)"><span class="ps-icon">🎵</span>TIKTOK</div>
+          <div class="plt-sel sel-yt" data-p="yt" onclick="selPlt(this)"><span class="ps-icon">▶️</span>YOUTUBE</div>
+        </div>
+      </div>
+      <div><label>Post Title / Topic</label><input type="text" id="mTitle" placeholder="e.g. Sussex meadow hay — first cut now available..."/></div>
+      <div class="field-row">
+        <div><label>Date & Time</label><input type="datetime-local" id="mDateTime"/></div>
+        <div><label>Format</label>
+          <select id="mFormat">
+            <option>Single Image</option><option>Reel</option><option>Carousel</option><option>Story</option>
+            <option>Short Video (15–30s)</option><option>Standard TikTok (60s)</option><option>Farm Tour / Walk</option>
+            <option>Standard Upload</option><option>YouTube Shorts</option><option>Live Stream</option>
+          </select>
+        </div>
+      </div>
+      <div><label>Caption / Notes</label><textarea id="mCaption" style="min-height:90px" placeholder="Paste your generated caption, or add notes for this post..."></textarea></div>
+      <div><label>Status</label>
+        <div class="tag-row" id="mStatus">
+          <div class="tone-btn active" data-v="draft">Draft</div>
+          <div class="tone-btn" data-v="ready">Ready</div>
+          <div class="tone-btn" data-v="approved">Approved ✓</div>
+        </div>
+      </div>
+      <div class="ai-disclosure-box">
+        <label class="ai-toggle"><input type="checkbox" id="mAI"/><span class="ai-slider"></span></label>
+        <div class="ai-disc-label"><strong>AI-Generated Image</strong> — auto-appends #AIGenerated disclosure</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="savePost()">Save to Calendar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let activeView='ig';
+let calYear=2026,calMonth=2;
+let posts=JSON.parse(localStorage.getItem('haymart_posts')||'[]');
+let editId=null;
+let S={
+  ig:{fmt:'Single Image',content:['product showcase'],tone:'trusted & practical',aiMode:'real',aiDisc:false},
+  tt:{fmt:'Short Video (15–30s)',content:['educational hay / forage'],tone:'practical & knowledgeable',aiMode:'real',aiDisc:false},
+  yt:{fmt:'Standard Upload',content:['buyer guide / how to'],length:'5–15 minute educational',aiMode:'real',aiDisc:false}
+};
+
+function switchView(v){
+  activeView=v;
+  ['ig','tt','yt','eng','guide','cal'].forEach(x=>{document.getElementById('view-'+x).style.display=x===v?'block':'none';const t=document.getElementById('tab-'+x);t.className='nav-tab'+(x===v?' active-'+x:'');});
+  if(v==='cal')renderCal();
+}
+
+function bindFmts(id,p,cls){document.getElementById(id).addEventListener('click',e=>{const c=e.target.closest('.fmt-card');if(!c)return;document.querySelectorAll('#'+id+' .fmt-card').forEach(x=>x.classList.remove('ig-active','tt-active','yt-active'));c.classList.add(cls);S[p].fmt=c.dataset.fmt;});}
+bindFmts('ig-fmts','ig','ig-active');bindFmts('tt-fmts','tt','tt-active');bindFmts('yt-fmts','yt','yt-active');
+
+['ig','tt','yt'].forEach(p=>{document.getElementById(p+'-ctags').addEventListener('click',e=>{const t=e.target.closest('.ctag');if(!t)return;t.classList.toggle('active');const v=t.dataset.v;if(t.classList.contains('active'))S[p].content.push(v);else S[p].content=S[p].content.filter(x=>x!==v);});});
+['ig','tt'].forEach(p=>{document.getElementById(p+'-tone').addEventListener('click',e=>{const t=e.target.closest('.tone-btn');if(!t)return;document.querySelectorAll('#'+p+'-tone .tone-btn').forEach(x=>x.classList.remove('active'));t.classList.add('active');S[p].tone=t.dataset.v;});});
+document.getElementById('yt-length').addEventListener('click',e=>{const t=e.target.closest('.tone-btn');if(!t)return;document.querySelectorAll('#yt-length .tone-btn').forEach(x=>x.classList.remove('active'));t.classList.add('active');S.yt.length=t.dataset.v;});
+document.getElementById('mStatus').addEventListener('click',e=>{const t=e.target.closest('.tone-btn');if(!t)return;document.querySelectorAll('#mStatus .tone-btn').forEach(x=>x.classList.remove('active'));t.classList.add('active');});
+
+function setImgMode(p,mode,btn){
+  S[p].aiMode=mode;
+  document.querySelectorAll('#'+p+'-imgmode .img-mode-btn').forEach(x=>{x.classList.remove('active-real','active-ai');});
+  btn.classList.add(mode==='real'?'active-real':'active-ai');
+  document.getElementById(p+'-upload-wrap').style.display=mode==='real'?'block':'none';
+  const aiWrap=document.getElementById(p+'-ai-gen-wrap');
+  aiWrap.classList.toggle('show',mode==='ai');
+  if(mode==='ai'){document.getElementById(p+'-aicheck').checked=true;toggleDisc(p);}
+}
+
+function handleUpload(input,p){
+  const file=input.files[0];if(!file)return;
+  const fn=document.getElementById(p+'-fn');const preview=document.getElementById(p+'-preview');
+  const icon=document.getElementById(p+'-uph-icon');const title=document.getElementById(p+'-uph-title');const sub=document.getElementById(p+'-uph-sub');
+  fn.textContent=file.name;fn.style.display='block';title.textContent=file.name;sub.textContent=(file.size/1024/1024).toFixed(1)+' MB';
+  if(file.type.startsWith('image/')){const reader=new FileReader();reader.onload=e=>{preview.src=e.target.result;preview.style.display='block';icon.style.display='none';};reader.readAsDataURL(file);}
+  else{icon.textContent='🎬';preview.style.display='none';}
+}
+
+function toggleDisc(p){const cb=document.getElementById(p+'-aicheck');S[p].aiDisc=cb.checked;document.getElementById(p+'-disc-preview').style.display=cb.checked?'block':'none';}
+
+async function genAIPrompts(p){
+  const concept=document.getElementById(p+'-ai-concept').value.trim();
+  const topic=document.getElementById(p+'-topic')?.value||'';
+  const btn=document.getElementById(p+'-aibtn');
+  const results=document.getElementById(p+'-ai-results');
+  if(!concept){results.innerHTML='<div style="color:var(--red);font-family:\'Courier Prime\',monospace;font-size:11px;margin-top:8px">⚠ Describe the image first</div>';return;}
+  btn.disabled=true;btn.textContent='Generating…';
+  results.innerHTML='<div style="font-family:\'Courier Prime\',monospace;font-size:11px;color:var(--mid);margin-top:10px;letter-spacing:1px">Generating prompts…</div>';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,
+        messages:[{role:'user',content:`Generate optimised AI image prompts for: "${concept}" (context: Haymart.co.uk — UK/European hay and forage marketplace, agricultural, British countryside, honest warm aesthetic. Post about: ${topic||'hay and forage products'}). Return ONLY valid JSON: {"dalle":"<DALL-E 3 prompt under 900 chars, photorealistic British countryside warm tones>","stable":"<Stable Diffusion 3.5 prompt>","midjourney":"<Midjourney v6 prompt with --ar 1:1 --style raw>"}`}]})
+    });
+    const data=await res.json();
+    const r=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    results.innerHTML=`<div class="ai-prompts-wrap">
+      <div class="ai-prompt-block"><div class="apb-label" style="color:#c07000">DALL·E 3</div><div class="apb-text" id="p-dalle-${p}">${escH(r.dalle)}</div><button class="apb-copy" onclick="copyEl('p-dalle-${p}',this)">Copy</button></div>
+      <div class="ai-prompt-block"><div class="apb-label" style="color:var(--sage)">STABLE DIFFUSION 3.5</div><div class="apb-text" id="p-sd-${p}">${escH(r.stable)}</div><button class="apb-copy" onclick="copyEl('p-sd-${p}',this)">Copy</button></div>
+      <div class="ai-prompt-block"><div class="apb-label" style="color:var(--bark)">MIDJOURNEY v6</div><div class="apb-text" id="p-mj-${p}">${escH(r.midjourney)}</div><button class="apb-copy" onclick="copyEl('p-mj-${p}',this)">Copy</button></div>
+      <div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px">Copy prompt → paste into your AI image tool → upload the result. Disclosure will auto-apply.</div>
+    </div>`;
+    document.getElementById(p+'-aicheck').checked=true;toggleDisc(p);
+  }catch(err){results.innerHTML=`<div style="color:var(--red);font-family:'Courier Prime',monospace;font-size:11px;margin-top:8px">⚠ ${escH(err.message)}</div>`;}
+  finally{btn.disabled=false;btn.textContent='Generate Optimised Prompts';}
+}
+
+let lInt;
+function startProg(id){let w=0;const b=document.getElementById(id);b.style.width='0%';lInt=setInterval(()=>{w=Math.min(w+Math.random()*7,88);b.style.width=w+'%';},180);}
+function endProg(id){clearInterval(lInt);const b=document.getElementById(id);b.style.width='100%';setTimeout(()=>b.style.width='0%',400);}
+function copyText(id,btn){const el=document.getElementById(id);navigator.clipboard.writeText(el.dataset.raw||el.innerText).then(()=>{btn.textContent='Copied ✓';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);});}
+function copyTags(id,btn){navigator.clipboard.writeText(document.getElementById(id).dataset.raw).then(()=>{btn.textContent='Copied ✓';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy All';btn.classList.remove('copied');},2000);});}
+function copyEl(id,btn){const el=document.getElementById(id);navigator.clipboard.writeText(el.innerText).then(()=>{btn.textContent='Copied ✓';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);});}
+
+function schedulePost(p,title,caption,aiDisc){
+  editId=null;
+  document.querySelectorAll('#mPlatform .plt-sel').forEach(x=>x.classList.remove('selected'));
+  document.querySelector('#mPlatform .sel-'+p).classList.add('selected');
+  document.getElementById('mTitle').value=title||'';document.getElementById('mCaption').value=caption||'';document.getElementById('mAI').checked=aiDisc||false;
+  const now=new Date();now.setHours(now.getHours()+1,0,0,0);
+  document.getElementById('mDateTime').value=now.toISOString().slice(0,16);document.getElementById('mFormat').value=S[p].fmt||'Single Image';
+  document.querySelectorAll('#mStatus .tone-btn').forEach(x=>x.classList.remove('active'));document.querySelector('#mStatus .tone-btn[data-v="draft"]').classList.add('active');
+  document.getElementById('schedModal').style.display='flex';
+}
+
+const BASE=`You are the social media manager for Haymart (haymarket.co.uk) — an AI-powered hay and forage marketplace for the UK and European agricultural market. Connects farmers/suppliers directly with buyers (horse owners, equestrian centres, livestock farmers, smallholders). 8% transaction commission, AI-managed customer service, largely autonomous platform. Pre-launch 2026. Voice: honest, practical, trusted, British countryside values. Knowledgeable neighbour, not faceless corporation.`;
+
+function buildPrompt(p){
+  const ai=S[p].aiDisc?'\nNOTE: This post uses AI-generated imagery — append "#AIGenerated 🤖" with a brief honest note.':'';
+  const imgNote=S[p].aiMode==='ai'?'This post uses AI-generated imagery.':'This post uses real farm/product photography.';
+  if(p==='ig'){
+    const topic=document.getElementById('ig-topic').value.trim();const cta=document.getElementById('ig-cta').value.trim();const notes=document.getElementById('ig-notes').value.trim();
+    return `${BASE}\n${imgNote}\nPLATFORM: Instagram\nFORMAT: ${S.ig.fmt}\nTOPIC: ${topic}\nANGLE: ${S.ig.content.join(', ')}\nTONE: ${S.ig.tone}${cta?'\nCTA: '+cta:''}${notes?'\nNOTES: '+notes:''}${ai}\n\nReturn ONLY valid JSON:\n{"caption":"Full caption, warm practical British voice, emojis sparingly, line breaks${S.ig.aiDisc?', end with \\n\\n#AIGenerated 🤖':''}","hashtags":["25","hashtags","mix","of","hay","equestrian","farming","agricultural","uk","specific"],"scheduleSuggestions":[{"day":"Day","time":"HH:MM","reason":"why this time works for farmers and horse owners"},{"day":"Day","time":"HH:MM","reason":"why"},{"day":"Day","time":"HH:MM","reason":"why"}],"dmTemplate":"Warm 2-3 sentence DM to new followers — invite them to browse or list on Haymart, no hard sell","engagementComments":["3 genuinely helpful comments for equestrian centres, hay supplier and farming accounts"]}`;
+  }
+  if(p==='tt'){
+    const topic=document.getElementById('tt-topic').value.trim();const hook=document.getElementById('tt-hook').value.trim();const notes=document.getElementById('tt-notes').value.trim();
+    return `${BASE}\n${imgNote}\nPLATFORM: TikTok\nFORMAT: ${S.tt.fmt}\nTOPIC: ${topic}\nANGLE: ${S.tt.content.join(', ')}\nTONE: ${S.tt.tone}${hook?'\nHOOK: '+hook:''}${notes?'\nNOTES: '+notes:''}${ai}\n\nReturn ONLY valid JSON:\n{"hook":"Practical knowledgeable scroll-stopper for horse owners / farmers${S.tt.aiDisc?' + #AIGenerated 🤖':''}","caption":"Short genuine TikTok caption, warm British countryside voice, 2-4 emojis, CTA","hashtags":["20","hashtags","no","hash","agricultural","equestrian","farming","hay","horse"],"scriptOutline":["bullet","point","video","structure"],"trendingAudio":"Suggested audio style for agricultural / countryside TikTok","scheduleSuggestions":[{"day":"Day","time":"HH:MM","reason":"why"},{"day":"Day","time":"HH:MM","reason":"why"},{"day":"Day","time":"HH:MM","reason":"why"}],"engagementComments":["3 helpful comments for equestrian and farming TikTok accounts"]}`;
+  }
+  if(p==='yt'){
+    const topic=document.getElementById('yt-topic').value.trim();const kw=document.getElementById('yt-kw').value.trim();const notes=document.getElementById('yt-notes').value.trim();
+    return `${BASE}\n${imgNote}\nPLATFORM: YouTube\nTYPE: ${S.yt.fmt}\nTOPIC: ${topic}\nANGLE: ${S.yt.content.join(', ')}\nLENGTH: ${S.yt.length}${kw?'\nKEYWORDS: '+kw:''}${notes?'\nNOTES: '+notes:''}${ai}\n\nReturn ONLY valid JSON:\n{"title":"SEO-optimised YouTube title under 70 chars — practical, trustworthy, UK farming audience","description":"Full description: intro in warm Haymart voice, key points, Haymart.co.uk links, subscribe CTA${S.yt.aiDisc?', brief AI disclosure note':''}","tags":["20","youtube","tags"],"thumbnailGuide":"How to compose the thumbnail from real or AI imagery for maximum click-through — warm countryside aesthetic","chapterMarkers":["00:00 - Intro","chapters..."],"scheduleSuggestions":[{"day":"Day","time":"HH:MM","reason":"why"},{"day":"Day","time":"HH:MM","reason":"why"},{"day":"Day","time":"HH:MM","reason":"why"}],"streamSetup":"If live Q&A: stream title, suggested chat questions, pinned comment; else N/A"}`;
+  }
+}
+
+async function generate(p){
+  const el=document.getElementById(p+'-topic');
+  if(!el||!el.value.trim()){document.getElementById(p+'-output').innerHTML='<div class="error-msg">⚠ Please enter a topic or product focus.</div>';return;}
+  const btn=document.getElementById(p+'-btn');btn.disabled=true;btn.textContent='Generating…';startProg(p+'-prog');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:buildPrompt(p)}]})});
+    const data=await res.json();
+    const result=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    endProg(p+'-prog');renderOutput(p,result);
+  }catch(err){endProg(p+'-prog');document.getElementById(p+'-output').innerHTML=`<div class="error-msg">⚠ ${escH(err.message)}</div>`;}
+  finally{btn.disabled=false;btn.textContent='Generate '+(p==='ig'?'Instagram':p==='tt'?'TikTok':'YouTube')+' Content';}
+}
+
+function renderOutput(p,r){
+  const cc=p+'-card';const topicVal=document.getElementById(p+'-topic').value.trim();const aiDisc=S[p].aiDisc;
+  let html='';
+  const aiBadge=aiDisc?'<span class="ai-badge">🤖 AI Disclosed</span>':'';
+
+  if(p==='ig'){
+    const tr=r.hashtags.map(h=>'#'+h).join(' ');
+    const th=r.hashtags.map((h,i)=>`<span class="htag" style="animation-delay:${i*.03}s">#${h}</span>`).join('');
+    const sh=r.scheduleSuggestions.map(s=>`<div class="sched-row"><span class="sr-time">${s.time}</span><span class="sr-day">${s.day}</span><span class="sr-reason">${s.reason}</span></div>`).join('');
+    const eh=r.engagementComments.map((c,i)=>`<div class="eng-item"><span class="ei-num">${i+1}.</span><span>${c}</span></div>`).join('');
+    html=`<div class="output-grid">
+      <div class="output-card ${cc} full-width"><div class="oc-header"><h3>📝 Caption</h3><div class="oc-btns">${aiBadge}<button class="save-btn" onclick="schedulePost('ig',${JSON.stringify(topicVal)},${JSON.stringify(r.caption)},${aiDisc})">+ Schedule</button><button class="copy-btn" onclick="copyText('ig-cap',this)">Copy</button></div></div><div class="oc-body" id="ig-cap" data-raw="${esc(r.caption)}">${escH(r.caption)}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3># Hashtags (${r.hashtags.length})</h3><button class="copy-btn" onclick="copyTags('ig-ht',this)">Copy All</button></div><div class="hashtag-wrap" id="ig-ht" data-raw="${esc(tr)}">${th}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🕐 Best Post Times</h3></div><div class="sched-list">${sh}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>💬 New Follower DM</h3><button class="copy-btn" onclick="copyText('ig-dm',this)">Copy</button></div><div class="oc-body" id="ig-dm" data-raw="${esc(r.dmTemplate)}">${escH(r.dmTemplate)}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🌾 Engagement Comments</h3></div><div style="padding:4px 14px 10px">${eh}</div></div>
+    </div>`;
+  }
+  if(p==='tt'){
+    const tr=r.hashtags.map(h=>'#'+h).join(' ');const th=r.hashtags.map((h,i)=>`<span class="htag tt" style="animation-delay:${i*.03}s">#${h}</span>`).join('');
+    const sh=r.scheduleSuggestions.map(s=>`<div class="sched-row"><span class="sr-time">${s.time}</span><span class="sr-day">${s.day}</span><span class="sr-reason">${s.reason}</span></div>`).join('');
+    const eh=r.engagementComments.map((c,i)=>`<div class="eng-item"><span class="ei-num" style="color:var(--sage)">${i+1}.</span><span>${c}</span></div>`).join('');
+    const sc=Array.isArray(r.scriptOutline)?r.scriptOutline.map(l=>`<div style="padding:4px 0;border-bottom:1px solid var(--parch);font-size:13px;color:var(--ink);line-height:1.5">${escH(l)}</div>`).join(''):escH(r.scriptOutline||'');
+    html=`<div class="output-grid">
+      <div class="output-card ${cc}"><div class="oc-header"><h3>⚡ Opening Hook</h3><button class="copy-btn" onclick="copyText('tt-hookout',this)">Copy</button></div><div class="hook-box"><div class="hook-label">FIRST 2 SECONDS</div><div class="hook-text" id="tt-hookout">${escH(r.hook)}</div></div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>📝 Caption</h3><div class="oc-btns">${aiBadge}<button class="save-btn" onclick="schedulePost('tt',${JSON.stringify(topicVal)},${JSON.stringify(r.caption)},${aiDisc})">+ Schedule</button><button class="copy-btn" onclick="copyText('tt-cap',this)">Copy</button></div></div><div class="oc-body" id="tt-cap" data-raw="${esc(r.caption)}">${escH(r.caption)}</div></div>
+      <div class="output-card ${cc} full-width"><div class="oc-header"><h3>🎬 Script Outline</h3><button class="copy-btn" onclick="copyText('tt-sc',this)">Copy</button></div><div style="padding:9px 14px" id="tt-sc" data-raw="${esc(Array.isArray(r.scriptOutline)?r.scriptOutline.join('\n'):r.scriptOutline||'')}">${sc}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3># Hashtags</h3><button class="copy-btn" onclick="copyTags('tt-ht',this)">Copy All</button></div><div class="hashtag-wrap" id="tt-ht" data-raw="${esc(tr)}">${th}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🎵 Trending Audio</h3></div><div class="oc-body" style="min-height:50px">${escH(r.trendingAudio||'N/A')}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🕐 Best Times</h3></div><div class="sched-list">${sh}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🌾 Engagement Comments</h3></div><div style="padding:4px 14px 10px">${eh}</div></div>
+    </div>`;
+  }
+  if(p==='yt'){
+    const tr=r.tags.join(', ');const th=r.tags.map((t,i)=>`<span class="htag yt" style="animation-delay:${i*.03}s">${t}</span>`).join('');
+    const sh=r.scheduleSuggestions.map(s=>`<div class="sched-row"><span class="sr-time">${s.time}</span><span class="sr-day">${s.day}</span><span class="sr-reason">${s.reason}</span></div>`).join('');
+    const ch=Array.isArray(r.chapterMarkers)?r.chapterMarkers.map(c=>`<div style="padding:4px 0;border-bottom:1px solid var(--parch);font-family:'Courier Prime',monospace;font-size:12px;color:var(--ink)">${escH(c)}</div>`).join(''):escH(r.chapterMarkers||'');
+    html=`<div class="output-grid">
+      <div class="output-card ${cc} full-width"><div class="oc-header"><h3>🎯 Video Title (SEO)</h3><div class="oc-btns">${aiBadge}<button class="save-btn" onclick="schedulePost('yt',${JSON.stringify(r.title)},${JSON.stringify(r.description)},${aiDisc})">+ Schedule</button><button class="copy-btn" onclick="copyText('yt-title',this)">Copy</button></div></div><div class="oc-body" style="font-size:17px;font-weight:700;min-height:46px;color:var(--ink);font-family:'Playfair Display',serif" id="yt-title" data-raw="${esc(r.title)}">${escH(r.title)}</div></div>
+      <div class="output-card ${cc} full-width"><div class="oc-header"><h3>📄 Description</h3><button class="copy-btn" onclick="copyText('yt-desc',this)">Copy</button></div><div class="oc-body" id="yt-desc" data-raw="${esc(r.description)}">${escH(r.description)}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🖼️ Thumbnail Guide</h3><button class="copy-btn" onclick="copyText('yt-thumb',this)">Copy</button></div><div style="padding:13px;background:rgba(200,168,75,.04)"><div style="font-family:'Courier Prime',monospace;font-size:10px;color:var(--straw-d);letter-spacing:1px;margin-bottom:6px">COMPOSITION NOTES</div><div style="font-size:13px;color:var(--earth-l);line-height:1.7;font-style:italic;font-family:'Playfair Display',serif" id="yt-thumb">${escH(r.thumbnailGuide)}</div></div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>📑 Chapters</h3><button class="copy-btn" onclick="copyText('yt-chap',this)">Copy</button></div><div style="padding:9px 14px" id="yt-chap" data-raw="${esc(Array.isArray(r.chapterMarkers)?r.chapterMarkers.join('\n'):r.chapterMarkers||'')}">${ch}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3># Tags</h3><button class="copy-btn" onclick="copyTags('yt-ht',this)">Copy All</button></div><div class="hashtag-wrap" id="yt-ht" data-raw="${esc(tr)}">${th}</div></div>
+      <div class="output-card ${cc}"><div class="oc-header"><h3>🕐 Best Publish Times</h3></div><div class="sched-list">${sh}</div></div>
+      ${r.streamSetup&&r.streamSetup!=='N/A'&&r.streamSetup.length>10?`<div class="output-card ${cc} full-width"><div class="oc-header"><h3>🔴 Stream Setup</h3><button class="copy-btn" onclick="copyText('yt-stream',this)">Copy</button></div><div class="oc-body" id="yt-stream" data-raw="${esc(r.streamSetup)}">${escH(r.streamSetup)}</div></div>`:''}
+    </div>`;
+  }
+  document.getElementById(p+'-output').innerHTML=html;
+}
+
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function calNav(d){calMonth+=d;if(calMonth>11){calMonth=0;calYear++;}else if(calMonth<0){calMonth=11;calYear--;}renderCal();}
+
+function renderCal(){
+  document.getElementById('calLabel').textContent=MONTHS[calMonth]+' '+calYear;
+  document.getElementById('calDayNames').innerHTML=DAYS.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+  const today=new Date();const first=new Date(calYear,calMonth,1);const last=new Date(calYear,calMonth+1,0);
+  let off=(first.getDay()+6)%7;const cells=[];
+  for(let i=off-1;i>=0;i--)cells.push({d:new Date(calYear,calMonth,0-i),o:true});
+  for(let i=1;i<=last.getDate();i++)cells.push({d:new Date(calYear,calMonth,i),o:false});
+  const rem=(7-cells.length%7)%7;for(let i=1;i<=rem;i++)cells.push({d:new Date(calYear,calMonth+1,i),o:true});
+  const ICONS={ig:'📸',tt:'🎵',yt:'▶️'};
+  document.getElementById('calBody').innerHTML=cells.map(({d,o})=>{
+    const isToday=d.toDateString()===today.toDateString();
+    const ds=d.toISOString().split('T')[0];
+    const dp=posts.filter(p=>new Date(p.dt).toISOString().split('T')[0]===ds).sort((a,b)=>new Date(a.dt)-new Date(b.dt));
+    const ph=dp.map(p=>{const t=new Date(p.dt);const ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');return `<div class="cal-post ${p.plat}" onclick="editPost('${p.id}',event)">${ICONS[p.plat]||''}<span class="cp-t">${ts}</span>${escH(p.title.substring(0,13))}${p.title.length>13?'…':''}</div>`;}).join('');
+    return `<div class="cal-cell${isToday?' today':''}${o?' other-month':''}" onclick="openModal('${ds}')"><div class="cal-date">${d.getDate()}</div>${ph}<button class="cal-add-btn" onclick="openModal('${ds}',event)">+</button></div>`;
+  }).join('');
+  renderQueue();
+}
+
+function renderQueue(){
+  const q=document.getElementById('schedQueue');
+  if(!posts.length){q.innerHTML='<div class="empty-queue">No posts scheduled yet — generate content and click + Schedule</div>';return;}
+  const sorted=[...posts].sort((a,b)=>new Date(a.dt)-new Date(b.dt));
+  const ICONS={ig:'📸',tt:'🎵',yt:'▶️'};
+  q.innerHTML=sorted.map(p=>{
+    const d=new Date(p.dt);const ds=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});const ts=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="sq-item ${p.plat}"><span class="sq-plat">${ICONS[p.plat]||'📌'}</span>
+      <div class="sq-info"><div class="sq-title">${escH(p.title)}</div>
+      <div class="sq-meta"><span class="sq-time">${ds} · ${ts}</span><span class="sq-badge ${p.plat}">${(p.fmt||p.plat).toUpperCase()}</span><span class="sq-badge status-${p.status||'draft'}">${(p.status||'Draft').charAt(0).toUpperCase()+(p.status||'draft').slice(1)}</span>${p.aiDisc?'<span class="sq-ai-tag">🤖 AI Disclosed</span>':''}</div></div>
+      <button class="sq-delete" onclick="deletePost('${p.id}',event)">✕</button></div>`;
+  }).join('');
+}
+
+function openModal(ds,evt){if(evt)evt.stopPropagation();editId=null;const dt=ds?new Date(ds+'T09:00'):new Date();document.getElementById('mDateTime').value=dt.toISOString().slice(0,16);document.getElementById('mTitle').value='';document.getElementById('mCaption').value='';document.getElementById('mAI').checked=false;document.getElementById('mFormat').value='Single Image';document.querySelectorAll('#mPlatform .plt-sel').forEach(x=>x.classList.remove('selected'));document.querySelector('#mPlatform .sel-ig').classList.add('selected');document.querySelectorAll('#mStatus .tone-btn').forEach(x=>x.classList.remove('active'));document.querySelector('#mStatus .tone-btn[data-v="draft"]').classList.add('active');document.getElementById('schedModal').style.display='flex';}
+function editPost(id,evt){if(evt)evt.stopPropagation();const p=posts.find(x=>x.id===id);if(!p)return;editId=id;document.getElementById('mDateTime').value=new Date(p.dt).toISOString().slice(0,16);document.getElementById('mTitle').value=p.title;document.getElementById('mCaption').value=p.caption||'';document.getElementById('mAI').checked=p.aiDisc||false;document.getElementById('mFormat').value=p.fmt||'Single Image';document.querySelectorAll('#mPlatform .plt-sel').forEach(x=>{x.classList.remove('selected');if(x.dataset.p===p.plat)x.classList.add('selected');});document.querySelectorAll('#mStatus .tone-btn').forEach(x=>{x.classList.remove('active');if(x.dataset.v===p.status)x.classList.add('active');});document.getElementById('schedModal').style.display='flex';}
+function selPlt(el){document.querySelectorAll('#mPlatform .plt-sel').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');}
+function closeModal(){document.getElementById('schedModal').style.display='none';editId=null;}
+function savePost(){const title=document.getElementById('mTitle').value.trim();const dt=document.getElementById('mDateTime').value;if(!title||!dt){alert('Please enter a title and date/time.');return;}const plat=document.querySelector('#mPlatform .plt-sel.selected')?.dataset.p||'ig';const fmt=document.getElementById('mFormat').value;const caption=document.getElementById('mCaption').value;const status=document.querySelector('#mStatus .tone-btn.active')?.dataset.v||'draft';const aiDisc=document.getElementById('mAI').checked;if(editId){const idx=posts.findIndex(x=>x.id===editId);if(idx>-1)posts[idx]={...posts[idx],title,dt,plat,fmt,caption,status,aiDisc};}else posts.push({id:Date.now().toString(),title,dt,plat,fmt,caption,status,aiDisc});localStorage.setItem('haymart_posts',JSON.stringify(posts));closeModal();renderCal();}
+function deletePost(id,evt){if(evt)evt.stopPropagation();if(!confirm('Delete this post?'))return;posts=posts.filter(x=>x.id!==id);localStorage.setItem('haymart_posts',JSON.stringify(posts));renderCal();}
+
+function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/\n/g,'&#10;');}
+renderCal();
+
+// ENGAGEMENT HUB JS
+var engDmTone = 'warm and genuine';
+var engComQty = '5';
+var engLikeGoal = 'grow follower count fast';
+var ENG_PERSONA = "You are writing social media engagement content for Haymart, a UK-based AI-powered hay and forage marketplace connecting farmers with buyers. Voice: trustworthy, warm, knowledgeable — like a fellow farmer or rural land agent, not a tech startup. British English. Audience: horse owners, equestrian yards, smallholders, livestock farmers, agricultural community.";
+
+function engTab(t) {
+  var tabs = ['dm','comment','like','reply','info'];
+  for (var i=0; i<tabs.length; i++) {
+    var x = tabs[i];
+    var v = document.getElementById('engv-'+x);
+    var tb = document.getElementById('engt-'+x);
+    if (v) v.style.display = x===t ? 'grid' : 'none';
+    if (tb) {
+      if (x===t) { tb.style.color = '#7ab648'; tb.style.borderBottomColor = '#7ab648'; }
+      else { tb.style.color = '#555'; tb.style.borderBottomColor = 'transparent'; }
+    }
+  }
+}
+
+function engChip(el, groupId) {
+  var group = document.getElementById(groupId);
+  if (!group) return;
+  var chips = group.querySelectorAll('.chip, .moc');
+  for (var i=0; i<chips.length; i++) chips[i].classList.remove('on');
+  el.classList.add('on');
+  if (groupId === 'eng-dm-tone') engDmTone = el.getAttribute('data-t');
+  if (groupId === 'eng-com-qty') engComQty = el.getAttribute('data-t');
+  if (groupId === 'eng-like-goal') engLikeGoal = el.getAttribute('data-t');
+}
+
+function engStartP(id) {
+  var b = document.getElementById(id); if (!b) return;
+  var w = 0; b.style.width = '0%';
+  var iv = setInterval(function() { w = Math.min(w + Math.random()*8, 88); b.style.width = w+'%'; }, 180);
+  b._iv = iv;
+}
+function engEndP(id) {
+  var b = document.getElementById(id); if (!b) return;
+  if (b._iv) clearInterval(b._iv);
+  b.style.width = '100%'; setTimeout(function() { b.style.width = '0%'; }, 400);
+}
+
+function engCopy(id, btn) {
+  var el = document.getElementById(id);
+  var text = el ? (el.getAttribute('data-raw') || el.innerText) : '';
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'COPIED'; setTimeout(function() { btn.textContent = 'COPY'; }, 2000);
+  });
+}
+
+function engCard(label, id, text) {
+  var raw = String(text||'').replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
+  var safe = String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return '<div style="background:var(--ec-bg,#111);border:1px solid var(--ec-bdr,#222);border-radius:1px;overflow:hidden;margin-bottom:8px">'
+    + '<div style="padding:6px 12px;background:var(--ec-hdr,#0d0d0d);border-bottom:1px solid var(--ec-bdr,#222);display:flex;align-items:center;justify-content:space-between">'
+    + '<span style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;letter-spacing:2px;color:var(--ec-dim,#555);text-transform:uppercase">'+label+'</span>'
+    + '<button onclick="engCopy(''+id+'',this)" style="background:transparent;border:1px solid var(--ec-bdr,#333);color:var(--ec-dim,#888);font-family:Share Tech Mono,Special Elite,monospace;font-size:8px;padding:2px 8px;cursor:pointer;border-radius:1px;letter-spacing:1px">COPY</button>'
+    + '</div>'
+    + '<div id="'+id+'" data-raw="'+raw+'" style="padding:10px 12px;font-size:13px;line-height:1.8;color:var(--ec-txt,#ccc);white-space:pre-wrap;word-break:break-word">'+safe+'</div>'
+    + '</div>';
+}
+
+function generateEng(type) {
+  var idMap = {dm:'dm', comment:'com', like:'like', reply:'rep'};
+  var k = idMap[type];
+  var btnId = 'eng-'+k+'-btn', progId = 'eng-'+k+'-prog', outId = 'eng-'+k+'-out';
+  var btn = document.getElementById(btnId);
+  if (btn) { btn.disabled = true; btn.textContent = 'GENERATING...'; }
+  engStartP(progId);
+
+  var prompt = '';
+  if (type === 'dm') {
+    var plat = document.getElementById('eng-dm-plat').value;
+    var follType = document.getElementById('eng-dm-type').value;
+    var ctx = document.getElementById('eng-dm-ctx').value.trim();
+    prompt = ENG_PERSONA + '\n\nGenerate 5 new follower DM templates for ' + plat + '.\nFollower type: ' + follType + '\nTone: ' + engDmTone + (ctx ? '\nContext: '+ctx : '') + '\n\nReturn ONLY valid JSON: {"dms":["dm1","dm2","dm3","dm4","dm5"],"tips":["tip1","tip2","tip3"]}';
+  } else if (type === 'comment') {
+    var plat = document.getElementById('eng-com-plat').value;
+    var acType = document.getElementById('eng-com-type').value;
+    var topic = document.getElementById('eng-com-topic').value.trim();
+    prompt = ENG_PERSONA + '\n\nGenerate ' + engComQty + ' genuine comment drafts for ' + acType + ' posts on ' + plat + '.\nPost topic: ' + (topic||'general industry content') + '\nFeel genuinely human, authentic, vary length.\n\nReturn ONLY valid JSON: {"comments":["c1","c2","c3"],"tip":"one key tip"}';
+  } else if (type === 'like') {
+    var plat = document.getElementById('eng-like-plat').value;
+    var size = document.getElementById('eng-like-size').value;
+    prompt = ENG_PERSONA + '\n\nCreate a daily engagement strategy for ' + plat + '. Account size: ' + size + '. Goal: ' + engLikeGoal + '.\n\nReturn ONLY valid JSON: {"dailyMinutes":"X","morningTasks":["t1","t2"],"eveningTasks":["t1","t2"],"dailyLikes":"N","dailyComments":"N","weeklyDMs":"N","targetTypes":[{"type":"t","why":"w","how":"h"}],"avoidList":["a1","a2","a3"]}';
+  } else if (type === 'reply') {
+    var repType = document.getElementById('eng-rep-type').value;
+    var plat = document.getElementById('eng-rep-plat').value;
+    var comment = document.getElementById('eng-rep-comment').value.trim();
+    prompt = ENG_PERSONA + '\n\nGenerate 5 reply templates for: ' + repType + ' on ' + plat + '.' + (comment ? '\nActual comment: "'+comment+'"' : '') + '\nGenuine, human, brand-authentic, mix of lengths.\n\nReturn ONLY valid JSON: {"replies":["r1","r2","r3","r4","r5"],"tip":"one key tip"}';
+  }
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'x-api-key': getApiKey(), 'anthropic-version': '2023-06-01'},
+    body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1200, messages:[{role:'user',content:prompt}]})
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    engEndP(progId);
+    var raw = '';
+    for (var i=0; i<data.content.length; i++) raw += data.content[i].text||'';
+    var r = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    var html = '';
+
+    if (type === 'dm') {
+      var dms = r.dms||[];
+      for (var i=0; i<dms.length; i++) html += engCard('TEMPLATE '+(i+1), 'eng-dm-'+i, dms[i]);
+      html += '<div style="margin-top:10px;padding:10px 12px;background:var(--ec-hdr,#0d0d0d);border:1px solid var(--ec-bdr,#1a1a1a);border-radius:1px"><div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;color:var(--ec-dim,#555);letter-spacing:2px;margin-bottom:6px">DM TIPS</div>';
+      var tips = r.tips||[];
+      for (var i=0; i<tips.length; i++) html += '<div style="font-size:12px;color:var(--ec-dim,#888);padding:3px 0;border-bottom:1px solid var(--ec-bdr,#111)">' + String(tips[i]).replace(/</g,'&lt;') + '</div>';
+      html += '</div>';
+    } else if (type === 'comment') {
+      var comments = r.comments||[];
+      for (var i=0; i<comments.length; i++) html += engCard('COMMENT '+(i+1), 'eng-com-'+i, comments[i]);
+      html += '<div style="margin-top:8px;padding:8px 12px;background:var(--ec-hdr,#0d0d0d);border:1px solid var(--ec-bdr,#1a1a1a);border-radius:1px;font-size:12px;color:var(--ec-dim,#888)">&#128161; ' + String(r.tip||'').replace(/</g,'&lt;') + '</div>';
+    } else if (type === 'like') {
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+      html += '<div style="background:var(--ec-bg,#111);border:1px solid var(--ec-bdr,#222);border-radius:1px;padding:12px">';
+      html += '<div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;color:var(--ec-dim,#555);letter-spacing:2px;margin-bottom:8px">DAILY ROUTINE — ' + String(r.dailyMinutes||'').replace(/</g,'&lt;') + ' MINS</div>';
+      html += '<div style="font-size:11px;color:var(--ec-dim,#555);letter-spacing:1px;margin-bottom:4px;text-transform:uppercase">Morning</div>';
+      var mt = r.morningTasks||[];
+      for (var i=0; i<mt.length; i++) html += '<div style="font-size:12px;color:var(--ec-txt,#ccc);padding:2px 0">• '+String(mt[i]).replace(/</g,'&lt;')+'</div>';
+      html += '<div style="font-size:11px;color:var(--ec-dim,#555);letter-spacing:1px;margin:8px 0 4px;text-transform:uppercase">Evening</div>';
+      var et = r.eveningTasks||[];
+      for (var i=0; i<et.length; i++) html += '<div style="font-size:12px;color:var(--ec-txt,#ccc);padding:2px 0">• '+String(et[i]).replace(/</g,'&lt;')+'</div>';
+      html += '</div>';
+      html += '<div style="background:var(--ec-bg,#111);border:1px solid var(--ec-bdr,#222);border-radius:1px;padding:12px">';
+      html += '<div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;color:var(--ec-dim,#555);letter-spacing:2px;margin-bottom:8px">DAILY TARGETS</div>';
+      var goals = [['Likes/day',r.dailyLikes],['Comments/day',r.dailyComments],['DMs/week',r.weeklyDMs]];
+      for (var i=0; i<goals.length; i++) html += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--ec-bdr,#1a1a1a);font-size:12px"><span style="color:var(--ec-dim,#888)">'+goals[i][0]+'</span><strong style="color:var(--ec-txt,#ccc)">'+String(goals[i][1]||'').replace(/</g,'&lt;')+'</strong></div>';
+      html += '</div></div>';
+      html += '<div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;color:var(--ec-dim,#555);letter-spacing:2px;margin:8px 0 6px;text-transform:uppercase">Target Account Types</div>';
+      var targets = r.targetTypes||[];
+      for (var i=0; i<targets.length; i++) {
+        html += '<div style="background:var(--ec-bg,#111);border:1px solid var(--ec-bdr,#222);border-radius:1px;padding:10px 12px;margin-bottom:6px">';
+        html += '<div style="font-size:13px;font-weight:700;color:var(--ec-txt,#ccc);margin-bottom:4px">'+String((targets[i].type||'')).replace(/</g,'&lt;')+'</div>';
+        html += '<div style="font-size:12px;color:var(--ec-dim,#888);margin-bottom:2px">Why: '+String((targets[i].why||'')).replace(/</g,'&lt;')+'</div>';
+        html += '<div style="font-size:12px;color:var(--ec-dim,#888)">How: '+String((targets[i].how||'')).replace(/</g,'&lt;')+'</div></div>';
+      }
+      html += '<div style="font-family:Share Tech Mono,Special Elite,monospace;font-size:9px;color:var(--ec-dim,#555);letter-spacing:2px;margin:8px 0 6px;text-transform:uppercase">Avoid List</div>';
+      var avoid = r.avoidList||[];
+      for (var i=0; i<avoid.length; i++) html += '<div style="font-size:12px;color:var(--ec-dim,#888);padding:3px 0;border-bottom:1px solid var(--ec-bdr,#111)">&#9888; '+String(avoid[i]).replace(/</g,'&lt;')+'</div>';
+    } else if (type === 'reply') {
+      var replies = r.replies||[];
+      for (var i=0; i<replies.length; i++) html += engCard('REPLY '+(i+1), 'eng-rep-'+i, replies[i]);
+      html += '<div style="margin-top:8px;padding:8px 12px;background:var(--ec-hdr,#0d0d0d);border:1px solid var(--ec-bdr,#1a1a1a);border-radius:1px;font-size:12px;color:var(--ec-dim,#888)">&#128161; '+String(r.tip||'').replace(/</g,'&lt;')+'</div>';
+    }
+
+    var outEl = document.getElementById(outId);
+    if (outEl) outEl.innerHTML = html;
+  })
+  .catch(function(e) {
+    engEndP(progId);
+    var outEl = document.getElementById(outId);
+    if (outEl) outEl.innerHTML = '<div style="color:#ff3b3b;font-family:Share Tech Mono,monospace;font-size:10px;padding:10px;border:1px solid #ff3b3b22">ERROR: '+String(e.message).replace(/</g,'&lt;')+'</div>';
+  })
+  .finally(function() {
+    var btn2 = document.getElementById(btnId);
+    var labels = {dm:'DM TEMPLATES', comment:'COMMENT DRAFTS', like:'ENGAGEMENT STRATEGY', reply:'REPLY TEMPLATES'};
+    if (btn2) { btn2.disabled = false; btn2.textContent = 'GENERATE ' + (labels[type]||type.toUpperCase()); }
+  });
+}
+// END ENGAGEMENT HUB
+
+</script>
+</body>
+</html>
